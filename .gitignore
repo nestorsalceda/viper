@@ -1,3 +1,4 @@
 .*.swp
 viper.egg-info
 *.pyc
+dist
