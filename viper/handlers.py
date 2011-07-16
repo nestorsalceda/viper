@@ -24,7 +24,7 @@ class DistutilsHandler(web.RequestHandler):
             self._boundary(),
             self.request.body.replace("\n", "\r\n"),
             self.request.arguments,
-            {}
+            self.request.files
         )
 
     def _boundary(self):
@@ -37,6 +37,27 @@ class DistutilsHandler(web.RequestHandler):
         action = self.get_argument(':action')
 
         command = self.distutils_commands.command_for(action)
-        command.execute()
+        command.execute(**self._distutils_arguments())
 
+    def _distutils_arguments(self):
+        arguments = self.request.arguments.keys()
 
+        result = dict([(key, self._argument_if_not_is_unknown_or_empty(key)) for key in arguments])
+
+        result[u'classifiers'] = self.get_arguments(u'classifiers')
+
+        self._delete_field(result, 'metadata_version')
+        self._delete_field(result, ':action')
+        self._delete_field(result, 'protcol_version')
+
+        return result
+
+    def _argument_if_not_is_unknown_or_empty(self, argument):
+        value = self.get_argument(argument)
+        if not value or value == 'UNKNOWN':
+            value = None
+        return value
+
+    def _delete_field(self, fields, field):
+        if field in fields:
+            del fields[field]

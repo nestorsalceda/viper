@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import httplib
 from tornado import web, testing
 
 from pyDoubles.framework import *
@@ -10,39 +9,61 @@ from viper import handlers, commands
 
 URL = r'/'
 
-class TestDistutilsHandler(testing.AsyncHTTPTestCase):
-    def test_parses_body_using_bare_linefeeds_with_submit_action(self):
-        self.expects_command_creation_for('submit')
 
-        response = self.fetch(URL, method='POST',
+class TestDistutilsHandler(testing.AsyncHTTPTestCase):
+
+    def test_parses_body_using_bare_linefeeds_with_submit_action(self):
+        when(self.commands.command_for).with_args('submit').then_return(self.command)
+
+        self.fetch(URL, method='POST',
             body=self.distutils_submit_body(),
             headers=self.distutils_headers()
         )
 
-        assert_that(response.code, is_(httplib.OK))
-        self.assert_that_command_was_called()
+        assert_that_method(self.command.execute).was_called().with_args(
+            license=u'MIT/X11',
+            name=u'viper',
+            author=u'Néstor Salceda',
+            home_page=None,
+            download_url=None,
+            summary=None,
+            author_email=u'nestor.salceda@gmail.com',
+            version=u'0.1dev',
+            platform=None,
+            keywords=None,
+            classifiers=[],
+            description=None
+        )
 
     def test_parses_body_using_bare_linefeeds_with_file_upload_action(self):
-        self.expects_command_creation_for('file_upload')
+        when(self.commands.command_for).with_args('file_upload').then_return(self.command)
 
-        response = self.fetch(URL, method='POST',
+        self.fetch(URL, method='POST',
             body=self.distutils_file_upload_body(),
             headers=self.distutils_headers()
         )
 
-        assert_that(response.code, is_(httplib.OK))
-        self.assert_that_command_was_called()
-
-    def expects_command_creation_for(self, action):
-        self.fake_command = spy(commands.Command())
-
-        when(self.commands.command_for).with_args(action).then_return(self.fake_command)
-
-    def assert_that_command_was_called(self):
-        assert_that_method(self.commands.command_for).was_called()
-        assert_that_method(self.fake_command.execute).was_called()
+        assert_that_method(self.command.execute).was_called().with_args(
+            comment=None,
+            license=u'MIT/X11',
+            author=u'Néstor Salceda',
+            home_page=None,
+            md5_digest=u'4ab6e9469870b9de86f29b02913895dd',
+            filetype=u'sdist',
+            download_url=None,
+            summary=None,
+            platform=None,
+            version=u'0.1dev',
+            pyversion=None,
+            keywords=None,
+            author_email=u'nestor.salceda@gmail.com',
+            name=u'viper',
+            classifiers=[],
+            description=None
+        )
 
     def get_app(self):
+        self.command = spy(commands.Command())
         self.commands = spy(commands.CommandFactory())
         return web.Application([
             (URL, handlers.DistutilsHandler, dict(distutils_commands=self.commands))
