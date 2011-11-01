@@ -5,12 +5,10 @@ class Command(object):
         raise NotImplementedError()
 
 class SubmitCommand(Command):
-    def execute(self, **kwargs):
-        raise NotImplementedError()
+    pass
 
 class FileUploadCommand(Command):
-    def execute(self, **kwargs):
-        raise NotImplementedError()
+    pass
 
 class CommandFactory(object):
     _COMMANDS = {
