@@ -2,3 +2,5 @@
 viper.egg-info
 *.pyc
 dist
+*.orig
+.coverage
