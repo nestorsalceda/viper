@@ -6,7 +6,7 @@ from tornado import web, httputil
 class MainHandler(web.RequestHandler):
 
     def get(self):
-        self.render('main.html')
+        self.render(u'main.html')
 
 
 class DistutilsHandler(web.RequestHandler):
@@ -34,7 +34,7 @@ class DistutilsHandler(web.RequestHandler):
                 return field.split('=')[1]
 
     def post(self):
-        action = self.get_argument(':action')
+        action = self.get_argument(u':action')
 
         command = self.distutils_commands.command_for(action)
         command.execute(**self._distutils_arguments())
@@ -46,15 +46,15 @@ class DistutilsHandler(web.RequestHandler):
 
         result[u'classifiers'] = self.get_arguments(u'classifiers')
 
-        self._delete_field(result, 'metadata_version')
-        self._delete_field(result, ':action')
-        self._delete_field(result, 'protcol_version')
+        self._delete_field(result, u'metadata_version')
+        self._delete_field(result, u':action')
+        self._delete_field(result, u'protcol_version')
 
         return result
 
     def _argument_if_not_is_unknown_or_empty(self, argument):
         value = self.get_argument(argument)
-        if not value or value == 'UNKNOWN':
+        if not value or value == u'UNKNOWN':
             value = None
         return value
 
