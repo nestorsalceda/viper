@@ -64,7 +64,7 @@ class TestDistutilsHandler(testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.command = spy(commands.Command())
-        self.commands = spy(commands.CommandFactory())
+        self.commands = spy(commands.CommandFactory(empty_stub()))
         return web.Application([
             (URL, handlers.DistutilsHandler, dict(distutils_commands=self.commands))
         ])

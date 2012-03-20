@@ -8,7 +8,7 @@ import commands
 application = web.Application(
     [
         (r'/', handlers.MainHandler),
-        (r'/distutils', handlers.DistutilsHandler, dict(distutils_commands=commands.CommandFactory())),
+        (r'/distutils', handlers.DistutilsHandler, dict(distutils_commands=commands.CommandFactory(None))),
     ],
     debug=True,
     template_path=os.path.join(os.path.dirname(__file__), 'templates')
