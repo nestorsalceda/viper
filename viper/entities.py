@@ -48,3 +48,14 @@ class Package(object):
 
     def releases(self):
         return self._releases.values()
+
+    def __eq__(self, other):
+        return self.id_ == other.id_
+
+    @property
+    def id_(self):
+        return self._id
+
+    @id_.setter
+    def id_(self, value):
+        self._id = value
