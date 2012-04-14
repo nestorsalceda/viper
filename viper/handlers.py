@@ -33,6 +33,17 @@ class DistutilsHandler(web.RequestHandler):
             if 'boundary=' in field:
                 return field.split('=')[1]
 
+    def _uploaded_file(self):
+        if 'content' not in self.request.files:
+            return None
+
+        uploaded = self.request.files['content'][0]
+        # As we replaced lf with cr + lf for parsing http body, uploaded file
+        # was modified too.  We replace to original for avoding corruption
+        uploaded['body'] = uploaded['body'].replace('\r\n', '\n')
+
+        return uploaded
+
     def post(self):
         action = self.get_argument(u':action')
 
@@ -49,6 +60,8 @@ class DistutilsHandler(web.RequestHandler):
         self._delete_field(result, u'metadata_version')
         self._delete_field(result, u':action')
         self._delete_field(result, u'protcol_version')
+
+        result[u'uploaded_file'] = self._uploaded_file()
 
         return result
 
