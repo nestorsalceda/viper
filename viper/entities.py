@@ -4,10 +4,10 @@ import datetime
 
 
 class File(object):
-    def __init__(self, filetype):
+    def __init__(self, name, filetype, md5_digest):
+        self.name = name
         self.filetype = filetype
-        self.md5_digest = None
-        self.file_ = None
+        self.md5_digest = md5_digest
 
 
 class Release(object):
@@ -23,7 +23,13 @@ class Release(object):
         self.description = None
         self.keywords = None
         self.classifiers = None
-        self.files = []
+        self.files = {}
+
+    def upload(self, file_):
+        if file_.name in self.files:
+            raise ValueError
+
+        self.files[file_.name] = file_
 
 
 class Package(object):

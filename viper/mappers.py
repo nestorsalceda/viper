@@ -30,6 +30,12 @@ class PackageMapper(object):
         package.id_ = self.collection.save(query)
 
 
+class FileMapper(object):
+
+    def store(self, filename, content):
+        pass
+
+
 class Manipulator(son_manipulator.SONManipulator):
 
     def transform_incoming(self, son, collection):

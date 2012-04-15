@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from viper.entities import Package, Release
-from viper.mappers import PackageMapper, PackageNotFoundError
+from viper.entities import Package, Release, File
+from viper.mappers import PackageMapper, FileMapper, PackageNotFoundError
 
 
 class Command(object):
@@ -38,7 +38,30 @@ class SubmitCommand(Command):
 
 
 class FileUploadCommand(Command):
-    pass
+
+    def __init__(self, packages, files):
+        self.packages = packages
+        self.files = files
+
+    def execute(self, **kwargs):
+        self._associate_file_to_package(**kwargs)
+        self._store_raw(kwargs['uploaded_file'])
+
+    def _associate_file_to_package(self, **kwargs):
+        package = self.packages.get_by_name(kwargs[u'name'])
+        release = package.release(kwargs[u'version'])
+
+        uploaded = kwargs['uploaded_file']
+        release.upload(File(
+            uploaded['filename'],
+            kwargs['filetype'],
+            kwargs['md5_digest']
+        ))
+
+        self.packages.store(package)
+
+    def _store_raw(self, uploaded):
+        self.files.store(uploaded['filename'], uploaded['body'])
 
 
 class CommandFactory(object):
@@ -47,9 +70,11 @@ class CommandFactory(object):
         self.connection = connection
 
     def _registry(self):
+        packages = PackageMapper(self.connection)
+        files = FileMapper()
         return {
-            u'submit': SubmitCommand(PackageMapper(self.connection)),
-            u'file_upload': FileUploadCommand()
+            u'submit': SubmitCommand(packages),
+            u'file_upload': FileUploadCommand(packages, files)
         }
 
     def command_for(self, action):
