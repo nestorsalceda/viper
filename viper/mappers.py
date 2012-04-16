@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
 from pymongo import son_manipulator
+import gridfs
 
 from viper import entities
 
 
-class PackageNotFoundError(Exception):
+class NotFoundError(Exception):
     pass
 
+class AlreadyExistsError(Exception):
+    pass
 
 class PackageMapper(object):
 
@@ -18,7 +21,7 @@ class PackageMapper(object):
     def get_by_name(self, name):
         result = self.collection.find_one({u'name': name})
         if not result:
-            raise PackageNotFoundError()
+            raise NotFoundError()
 
         return result
 
@@ -32,8 +35,27 @@ class PackageMapper(object):
 
 class FileMapper(object):
 
+    def __init__(self, database):
+        self.database = database
+        self._collection = None
+
+    def _files(self):
+        if self._collection is None:
+            self._collection = gridfs.GridFS(self.database)
+
+        return self._collection
+
     def store(self, filename, content):
-        pass
+        if self._files().exists(filename):
+            raise AlreadyExistsError()
+
+        self._files().put(content, _id=filename, filename=filename)
+
+    def get_by_name(self, filename):
+        if not self._files().exists(filename):
+            raise NotFoundError()
+
+        return self._files().get(filename).read()
 
 
 class Manipulator(son_manipulator.SONManipulator):
@@ -64,7 +86,7 @@ class Manipulator(son_manipulator.SONManipulator):
         return result
 
     def transform_outgoing(self, son, collection):
-        if isinstance(son, dict):
+        if collection.name == u'packages' and isinstance(son, dict):
             return self._deserialize_package(son)
 
         return son

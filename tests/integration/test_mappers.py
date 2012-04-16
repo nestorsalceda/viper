@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from hamcrest import *
-from nose.tools import raises
+from nose.tools import assert_raises
 
 import pymongo
+import gridfs
 
 from viper import mappers
 from viper.entities import Package, Release
@@ -11,8 +12,25 @@ from viper.entities import Package, Release
 
 NAME = u'viper'
 VERSION = u'0.1dev'
+FILE_CONTENT = 'content'
 
-class TestPackageMapper(object):
+
+class _TestMapper(object):
+
+    def setup(self):
+        self.database = pymongo.Connection()['viper_package_index_test']
+        self.cleanup()
+
+    def cleanup(self):
+        pass
+
+    def delete_file(self, file_name):
+        filesystem = gridfs.GridFS(self.database)
+        if filesystem.exists(file_name):
+            filesystem.delete(file_name)
+
+
+class TestPackageMapper(_TestMapper):
 
     def test_insert_new_package(self):
         new = Package(NAME)
@@ -32,15 +50,52 @@ class TestPackageMapper(object):
         retrieved = self.mapper.get_by_name(NAME)
         assert_that(retrieved, is_(new))
 
-    @raises(mappers.PackageNotFoundError)
     def test_raise_error_unless_found(self):
-        self.mapper.get_by_name(NAME)
-
-    def setup(self):
-        self.database = pymongo.Connection()['viper_package_index_test']
-        self.cleanup()
-
-        self.mapper = mappers.PackageMapper(self.database)
+        with assert_raises(mappers.NotFoundError):
+            self.mapper.get_by_name(NAME)
 
     def cleanup(self):
         self.database.drop_collection(self.database.packages)
+
+        self.mapper = mappers.PackageMapper(self.database)
+
+
+class TestFileMapper(_TestMapper):
+
+    def test_insert_new_package(self):
+        self.mapper.store(NAME, FILE_CONTENT)
+
+        retrieved = self.mapper.get_by_name(NAME)
+        assert_that(retrieved, is_(FILE_CONTENT))
+
+    def test_an_existent_file_cannot_be_upgraded(self):
+        self.mapper.store(NAME, FILE_CONTENT)
+
+        with assert_raises(mappers.AlreadyExistsError):
+            self.mapper.store(NAME, FILE_CONTENT)
+
+    def test_raise_error_unless_found(self):
+        with assert_raises(mappers.NotFoundError):
+            self.mapper.get_by_name(NAME)
+
+    def cleanup(self):
+        self.delete_file(NAME)
+
+        self.mapper = mappers.FileMapper(self.database)
+
+
+class TestSONManipulatorCollision(_TestMapper):
+
+    def test_mappers_can_be_used_together(self):
+        self.files = mappers.FileMapper(self.database)
+        # As PackageMapper sets a custom SONManipulator to database, it should
+        # not collision with other mappers
+        self.packages = mappers.PackageMapper(self.database)
+
+        self.files.store(NAME, FILE_CONTENT)
+        retrieved = self.files.get_by_name(NAME)
+
+        assert_that(retrieved, is_(FILE_CONTENT))
+
+    def cleanup(self):
+        self.delete_file(NAME)

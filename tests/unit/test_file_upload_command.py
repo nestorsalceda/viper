@@ -17,7 +17,7 @@ class TestFileUploadCommand(object):
 
     def setup(self):
         self.packages = spy(PackageMapper(empty_stub()))
-        self.files = spy(FileMapper())
+        self.files = spy(FileMapper(empty_stub()))
         self.command = FileUploadCommand(self.packages, self.files)
 
     def test_upload_file_for_existent_package(self):

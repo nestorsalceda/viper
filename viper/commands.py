@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from viper.entities import Package, Release, File
-from viper.mappers import PackageMapper, FileMapper, PackageNotFoundError
+from viper import mappers
 
 
 class Command(object):
@@ -24,7 +24,7 @@ class SubmitCommand(Command):
     def _get_or_create_new(self, name):
         try:
             return self.packages.get_by_name(name)
-        except PackageNotFoundError:
+        except mappers.NotFoundError:
             return Package(name)
 
     def _release(self, **kwargs):
@@ -67,15 +67,12 @@ class FileUploadCommand(Command):
 class CommandFactory(object):
 
     def __init__(self, connection):
-        self.connection = connection
-
-    def _registry(self):
-        packages = PackageMapper(self.connection)
-        files = FileMapper()
-        return {
+        packages = mappers.PackageMapper(connection)
+        files = mappers.FileMapper(connection)
+        self._registry = {
             u'submit': SubmitCommand(packages),
             u'file_upload': FileUploadCommand(packages, files)
         }
 
     def command_for(self, action):
-        return self._registry().get(action, Command())
+        return self._registry.get(action, Command())
