@@ -4,8 +4,7 @@ import os
 from tornado import web
 import pymongo
 
-import handlers
-import commands
+from viper import handlers, commands
 
 def application():
     database = pymongo.Connection()['viper_package_index']
