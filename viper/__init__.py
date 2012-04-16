@@ -7,13 +7,15 @@ import pymongo
 import handlers
 import commands
 
-database = pymongo.Connection()['viper_package_index']
+def application():
+    database = pymongo.Connection()['viper_package_index']
+    distutils_commands = commands.CommandFactory(database)
 
-application = web.Application(
-    [
-        (r'/', handlers.MainHandler),
-        (r'/distutils', handlers.DistutilsHandler, dict(distutils_commands=commands.CommandFactory(database))),
-    ],
-    debug=True,
-    template_path=os.path.join(os.path.dirname(__file__), 'templates')
-)
+    return web.Application(
+        [
+            (r'/', handlers.MainHandler),
+            (r'/distutils', handlers.DistutilsHandler, dict(distutils_commands=distutils_commands)),
+        ],
+        debug=True,
+        template_path=os.path.join(os.path.dirname(__file__), 'templates')
+    )

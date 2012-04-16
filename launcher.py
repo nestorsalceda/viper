@@ -12,7 +12,7 @@ logger = logging.getLogger(__file__)
 if __name__ == '__main__':
     try:
         options.parse_command_line()
-        application.listen(options.options.port)
+        application().listen(options.options.port)
         logger.info('Listening on port: %s', options.options.port)
         ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:

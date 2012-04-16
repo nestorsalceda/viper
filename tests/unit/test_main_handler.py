@@ -18,4 +18,4 @@ class TestMainHandler(AsyncHTTPTestCase):
         assert_that(response.body, is_not(none()))
 
     def get_app(self):
-        return application
+        return application()
