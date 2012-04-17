@@ -21,5 +21,6 @@ def application():
             (r'/distutils', handlers.DistutilsHandler, dict(submit=submit, upload=upload)),
         ],
         debug=True,
-        template_path=os.path.join(os.path.dirname(__file__), 'templates')
+        template_path=os.path.join(os.path.dirname(__file__), 'templates'),
+        static_path=os.path.join(os.path.dirname(__file__), 'static')
     )
