@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from pymongo import son_manipulator
 import gridfs
 
@@ -29,6 +31,7 @@ class PackageMapper(object):
         query = {'package': package}
         if package.id_ is not None:
             query['_id'] = package.id_
+            package.last_updated_on = datetime.datetime.utcnow()
 
         package.id_ = self.collection.save(query)
 

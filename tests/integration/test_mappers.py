@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+
 from hamcrest import *
 from nose.tools import assert_raises
 
@@ -49,6 +51,16 @@ class TestPackageMapper(_TestMapper):
 
         retrieved = self.mapper.get_by_name(NAME)
         assert_that(retrieved, is_(new))
+
+    def test_update_package_updates_last_updated_on(self):
+        new = Package(NAME)
+        self.mapper.store(new)
+
+        updated = self.mapper.get_by_name(NAME)
+        updated.store_release(Release(VERSION))
+        self.mapper.store(updated)
+
+        assert_that(updated.last_updated_on, is_(greater_than(new.last_updated_on)))
 
     def test_raise_error_unless_found(self):
         with assert_raises(mappers.NotFoundError):
