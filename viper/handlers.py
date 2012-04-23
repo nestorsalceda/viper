@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import httplib
+
 from tornado import web, httputil
 
-from viper import commands
+from viper import commands, mappers
 
 
 class MainHandler(web.RequestHandler):
@@ -84,3 +86,16 @@ class DistutilsHandler(web.RequestHandler):
     def _delete_field(self, fields, field):
         if field in fields:
             del fields[field]
+
+
+class PackageHandler(web.RequestHandler):
+
+    def initialize(self, packages):
+        self.packages = packages
+
+    def get(self, id_):
+        try:
+            package = self.packages.get_by_name(id_)
+            self.render('package.html', package=package, last_release=package.last_release())
+        except mappers.NotFoundError:
+            raise web.HTTPError(httplib.NOT_FOUND)

@@ -55,6 +55,9 @@ class Package(object):
     def releases(self):
         return self._releases.values()
 
+    def last_release(self):
+        return self.release(self._releases.keys()[0])
+
     def __eq__(self, other):
         return self.id_ == other.id_
 

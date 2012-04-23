@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{package.name}} {{last_release.version}} · Viper
+{% end %}
+
+{% block content %}
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h1>{{package.name}} <small>{{last_release.version}}</small></h1>
+			<h3>{{last_release.summary}}</h3>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="span12">
+		<p>{{last_release.description}}</p>
+	</div>
+</div>
+{% end %}

@@ -19,6 +19,7 @@ def application():
         [
             (r'/', handlers.MainHandler),
             (r'/distutils', handlers.DistutilsHandler, dict(submit=submit, upload=upload)),
+            (r'/packages/(?P<id_>[a-zA-Z0-9.-]+)', handlers.PackageHandler, dict(packages=packages))
         ],
         debug=True,
         template_path=os.path.join(os.path.dirname(__file__), 'templates'),
