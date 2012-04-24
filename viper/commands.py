@@ -62,17 +62,3 @@ class FileUploadCommand(Command):
 
     def _store_raw(self, uploaded):
         self.files.store(uploaded['filename'], uploaded['body'])
-
-
-class CommandFactory(object):
-
-    def __init__(self, connection):
-        packages = mappers.PackageMapper(connection)
-        files = mappers.FileMapper(connection)
-        self._registry = {
-            u'submit': SubmitCommand(packages),
-            u'file_upload': FileUploadCommand(packages, files)
-        }
-
-    def command_for(self, action):
-        return self._registry.get(action, Command())

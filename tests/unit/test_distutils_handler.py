@@ -13,14 +13,12 @@ URL = r'/'
 class TestDistutilsHandler(testing.AsyncHTTPTestCase):
 
     def test_parses_body_using_bare_linefeeds_with_submit_action(self):
-        when(self.commands.command_for).with_args('submit').then_return(self.command)
-
         self.fetch(URL, method='POST',
             body=self.distutils_submit_body(),
             headers=self.distutils_headers()
         )
 
-        assert_that_method(self.command.execute).was_called().with_args(
+        assert_that_method(self.submit.execute).was_called().with_args(
             license=u'MIT/X11',
             name=u'viper',
             author=u'Néstor Salceda',
@@ -37,8 +35,6 @@ class TestDistutilsHandler(testing.AsyncHTTPTestCase):
         )
 
     def test_parses_body_using_bare_linefeeds_with_file_upload_action(self):
-        when(self.commands.command_for).with_args('file_upload').then_return(self.command)
-
         self.fetch(URL, method='POST',
             body=self.distutils_file_upload_body(),
             headers=self.distutils_headers()
@@ -47,7 +43,7 @@ class TestDistutilsHandler(testing.AsyncHTTPTestCase):
         # FIXME: Wait for the next pyDoubles release, this should be implemented
         # Or I can try to submit a patch :)
         # https://groups.google.com/forum/?fromgroups#!topic/pydoubles/J3CmxkE6D6E
-        assert_that_method(self.command.execute).was_called()#.with_args(
+        assert_that_method(self.upload.execute).was_called()#.with_args(
         #    comment=None,
         #    license=u'MIT/X11',
         #    author=u'Néstor Salceda',
@@ -72,10 +68,10 @@ class TestDistutilsHandler(testing.AsyncHTTPTestCase):
         #)
 
     def get_app(self):
-        self.command = spy(commands.Command())
-        self.commands = spy(commands.CommandFactory(empty_stub()))
+        self.submit = spy(commands.SubmitCommand(None))
+        self.upload = spy(commands.FileUploadCommand(None, None))
         return web.Application([
-            (URL, handlers.DistutilsHandler, dict(distutils_commands=self.commands))
+            (URL, handlers.DistutilsHandler, dict(submit=self.submit, upload=self.upload))
         ])
 
     def distutils_headers(self):

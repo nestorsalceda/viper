@@ -2,6 +2,8 @@
 
 from tornado import web, httputil
 
+from viper import commands
+
 
 class MainHandler(web.RequestHandler):
 
@@ -11,8 +13,9 @@ class MainHandler(web.RequestHandler):
 
 class DistutilsHandler(web.RequestHandler):
 
-    def initialize(self, distutils_commands):
-        self.distutils_commands = distutils_commands
+    def initialize(self, submit, upload):
+        self.submit = submit
+        self.upload = upload
 
     def prepare(self):
         self._parse_distutils_message()
@@ -45,10 +48,17 @@ class DistutilsHandler(web.RequestHandler):
         return uploaded
 
     def post(self):
-        action = self.get_argument(u':action')
-
-        command = self.distutils_commands.command_for(action)
+        command = self._choose_command()
         command.execute(**self._distutils_arguments())
+
+    def _choose_command(self):
+        action = self.get_argument(':action')
+        if action == u'submit':
+            return self.submit
+        elif action == u'file_upload':
+            return self.upload
+        else:
+            return commands.Command()
 
     def _distutils_arguments(self):
         arguments = self.request.arguments.keys()
