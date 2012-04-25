@@ -18,10 +18,29 @@
 		<div class="tabbable">
 			<ul class="nav nav-tabs">
 				<li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+				<li><a href="#info" data-toggle="tab">Info</a></li>
 			</ul>
 			<div class="tab-content">
 				<div class="tab-pane active" id="description">
 					{% raw last_release.html_description() %}
+				</div>
+				<div class="tab-pane" id="info">
+					<dl>
+					        <dt>Author</dt>
+						<dd>{{last_release.author}}</dd>
+						<dt>Home Page</dt>
+						<dd><a href="{{last_release.home_page}}">{{last_release.home_page}}</a></dd>
+						<dt>License</dt>
+						<dd>{{last_release.license}}</dd>
+						<dt>Classifiers</dt>
+						<dd>
+						<ul class="unstyled">
+							{% for classifier in last_release.classifiers %}
+							<li>{{classifier}}</li>
+							{% end %}
+						</ul>
+						</dd>
+					</dl>
 				</div>
 			</div>
 		</div>

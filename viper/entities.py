@@ -25,7 +25,7 @@ class Release(object):
         self.summary = None
         self.description = None
         self.keywords = None
-        self.classifiers = None
+        self.classifiers = []
         self.files = {}
 
     def add_file(self, file_):
