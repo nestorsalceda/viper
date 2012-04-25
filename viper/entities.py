@@ -2,6 +2,9 @@
 
 import datetime
 
+from docutils import core
+from docutils.writers import html4css1
+
 
 class File(object):
     def __init__(self, name, filetype, md5_digest):
@@ -30,6 +33,12 @@ class Release(object):
             raise ValueError
 
         self.files[file_.name] = file_
+
+    def html_description(self):
+        if self.description is None:
+            return None
+
+        return core.publish_parts(self.description, writer=html4css1.Writer())['html_body']
 
 
 class Package(object):

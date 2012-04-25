@@ -20,6 +20,7 @@ setup(name='viper',
       install_requires=[
           'tornado',
           'pymongo',
+          'docutils',
           'pydoubles',
           'nose',
           'pyhamcrest'

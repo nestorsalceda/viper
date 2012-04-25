@@ -15,7 +15,16 @@
 </div>
 <div class="row">
 	<div class="span12">
-		<p>{{last_release.description}}</p>
+		<div class="tabbable">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#description" data-toggle="tab">Description</a></li>
+			</ul>
+			<div class="tab-content">
+				<div class="tab-pane active" id="description">
+					{% raw last_release.html_description() %}
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 {% end %}

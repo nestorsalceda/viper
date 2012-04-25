@@ -43,3 +43,17 @@ class TestRelease(object):
 
         with assert_raises(ValueError):
             self.release.add_file(uploaded)
+
+    def test_html_description_is_html(self):
+        self.release.description = 'This package aims to integrate Mercurial and Status.net.'
+
+        assert_that(self.release.html_description(), contains_string(self.release.description))
+
+    def test_html_description_without_description(self):
+        assert_that(self.release.html_description(), is_(none()))
+
+    def test_html_description_with_errors_returns_error_message(self):
+        self.release.description = u'''Section Title
+============'''
+
+        assert_that(self.release.html_description(), contains_string('System Message: WARNING'))
