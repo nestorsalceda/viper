@@ -84,9 +84,12 @@ class Manipulator(son_manipulator.SONManipulator):
 
     def _serialize_release(self, release):
         result = dict(release.__dict__)
-        del result[u'files']
+        result[u'files'] = self._serialize_files(release)
 
         return result
+
+    def _serialize_files(self, release):
+        return [dict(file_.__dict__) for file_ in release.files.values()]
 
     def transform_outgoing(self, son, collection):
         if collection.name == u'packages' and isinstance(son, dict):
@@ -112,4 +115,9 @@ class Manipulator(son_manipulator.SONManipulator):
 
     def _deserialize_release(self, result):
         release = entities.Release(result[u'version'])
-        return self._inject_fields(release, result)
+        self._inject_fields(release, result, exclude=[u'files'])
+
+        for file_ in result[u'files']:
+            release.add_file(entities.File(file_[u'name'], file_[u'filetype'], file_['md5_digest']))
+
+        return release

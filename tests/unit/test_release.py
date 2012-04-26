@@ -22,24 +22,24 @@ class TestRelease(object):
         assert_that(self.release.version, is_(VERSION))
         assert_that(self.release.created_on, is_(datetime.datetime))
 
-    def test_upload_a_file(self):
+    def test_add_a_file(self):
         uploaded = File(
             FILE_NAME,
             FILE_TYPE,
             MD5_DIGEST
         )
 
-        self.release.upload(uploaded)
+        self.release.add_file(uploaded)
 
         assert_that(self.release.files, has_entry(FILE_NAME, uploaded))
 
-    def test_upload_an_existent_file_raises_error(self):
+    def test_add_an_existent_file_raises_error(self):
         uploaded = File(
             FILE_NAME,
             FILE_TYPE,
             MD5_DIGEST
         )
-        self.release.upload(uploaded)
+        self.release.add_file(uploaded)
 
         with assert_raises(ValueError):
-            self.release.upload(uploaded)
+            self.release.add_file(uploaded)

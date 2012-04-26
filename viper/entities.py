@@ -25,7 +25,7 @@ class Release(object):
         self.classifiers = None
         self.files = {}
 
-    def upload(self, file_):
+    def add_file(self, file_):
         if file_.name in self.files:
             raise ValueError
 

@@ -52,7 +52,7 @@ class FileUploadCommand(Command):
         release = package.release(kwargs[u'version'])
 
         uploaded = kwargs['uploaded_file']
-        release.upload(File(
+        release.add_file(File(
             uploaded['filename'],
             kwargs['filetype'],
             kwargs['md5_digest']
