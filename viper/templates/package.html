@@ -9,7 +9,9 @@
 	<div class="span12">
 		<div class="page-header">
 			<h1>{{package.name}} <small>{{last_release.version}}</small></h1>
+			{% if last_release.summary %}
 			<h3>{{last_release.summary}}</h3>
+			{% end %}
 		</div>
 	</div>
 </div>
@@ -24,16 +26,29 @@
 			</ul>
 			<div class="tab-content">
 				<div class="tab-pane active" id="description">
+					{% if last_release.html_description() %}
 					{% raw last_release.html_description() %}
+					{% else %}
+					<div class="alert">
+						<h4 class="alert-heading">No description available!</h4>
+						Users will be happier if you add a long description to this package
+					</div>
+					{% end %}
 				</div>
+
 				<div class="tab-pane" id="info">
 					<dl>
 					        <dt>Author</dt>
 						<dd>{{last_release.author}}</dd>
+						{% if last_release.home_page %}
 						<dt>Home Page</dt>
 						<dd><a href="{{last_release.home_page}}">{{last_release.home_page}}</a></dd>
+						{% end %}
+						{% if last_release.license %}
 						<dt>License</dt>
 						<dd>{{last_release.license}}</dd>
+						{% end %}
+						{% if last_release.classifiers %}
 						<dt>Classifiers</dt>
 						<dd>
 						<ul class="unstyled">
@@ -42,9 +57,11 @@
 							{% end %}
 						</ul>
 						</dd>
+						{% end %}
 					</dl>
 				</div>
 				<div class="tab-pane" id="files">
+					{% if last_release.files %}
 					<table class="table table-bordered">
 						<thead>
 							<tr>
@@ -61,6 +78,12 @@
 							{% end %}
 						</tbody>
 					</table>
+					{% else %}
+					<div class="alert">
+						<h4 class="alert-heading">No files available!</h4>
+						Users will be happier if you add some files to this release
+					</div>
+					{% end %}
 				</div>
 				<div class="tab-pane" id="releases">
 					<table class="table table-bordered">
