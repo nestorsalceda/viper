@@ -93,9 +93,13 @@ class PackageHandler(web.RequestHandler):
     def initialize(self, packages):
         self.packages = packages
 
-    def get(self, id_):
+    def get(self, id_, version=None):
         try:
             package = self.packages.get_by_name(id_)
-            self.render('package.html', package=package, last_release=package.last_release())
-        except mappers.NotFoundError:
+            if version is None:
+                current_release = package.last_release()
+            else:
+                current_release = package.release(version)
+            self.render('package.html', package=package, current_release=current_release)
+        except (mappers.NotFoundError, ValueError):
             raise web.HTTPError(httplib.NOT_FOUND)

@@ -1,16 +1,16 @@
 {% extends "base.html" %}
 
 {% block title %}
-{{package.name}} {{last_release.version}} · Viper
+{{package.name}} {{current_release.version}} · Viper
 {% end %}
 
 {% block content %}
 <div class="row">
 	<div class="span12">
 		<div class="page-header">
-			<h1>{{package.name}} <small>{{last_release.version}}</small></h1>
-			{% if last_release.summary %}
-			<h3>{{last_release.summary}}</h3>
+			<h1>{{package.name}} <small>{{current_release.version}}</small></h1>
+			{% if current_release.summary %}
+			<h3>{{current_release.summary}}</h3>
 			{% end %}
 		</div>
 	</div>
@@ -21,13 +21,13 @@
 			<ul class="nav nav-tabs">
 				<li class="active"><a href="#description" data-toggle="tab">Description</a></li>
 				<li><a href="#info" data-toggle="tab">Info</a></li>
-				<li><a href="#files" data-toggle="tab">Files ({{len(last_release.files)}})</a></li>
+				<li><a href="#files" data-toggle="tab">Files ({{len(current_release.files)}})</a></li>
 				<li><a href="#releases" data-toggle="tab">All Releases ({{len(package.releases())}})</a></li>
 			</ul>
 			<div class="tab-content">
 				<div class="tab-pane active" id="description">
-					{% if last_release.html_description() %}
-					{% raw last_release.html_description() %}
+					{% if current_release.html_description() %}
+					{% raw current_release.html_description() %}
 					{% else %}
 					<div class="alert">
 						<h4 class="alert-heading">No description available!</h4>
@@ -39,20 +39,20 @@
 				<div class="tab-pane" id="info">
 					<dl>
 					        <dt>Author</dt>
-						<dd>{{last_release.author}}</dd>
-						{% if last_release.home_page %}
+						<dd>{{current_release.author}}</dd>
+						{% if current_release.home_page %}
 						<dt>Home Page</dt>
-						<dd><a href="{{last_release.home_page}}">{{last_release.home_page}}</a></dd>
+						<dd><a href="{{current_release.home_page}}">{{current_release.home_page}}</a></dd>
 						{% end %}
-						{% if last_release.license %}
+						{% if current_release.license %}
 						<dt>License</dt>
-						<dd>{{last_release.license}}</dd>
+						<dd>{{current_release.license}}</dd>
 						{% end %}
-						{% if last_release.classifiers %}
+						{% if current_release.classifiers %}
 						<dt>Classifiers</dt>
 						<dd>
 						<ul class="unstyled">
-							{% for classifier in last_release.classifiers %}
+							{% for classifier in current_release.classifiers %}
 							<li>{{classifier}}</li>
 							{% end %}
 						</ul>
@@ -61,7 +61,7 @@
 					</dl>
 				</div>
 				<div class="tab-pane" id="files">
-					{% if last_release.files %}
+					{% if current_release.files %}
 					<table class="table table-bordered">
 						<thead>
 							<tr>
@@ -70,7 +70,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{% for file_ in last_release.files.values() %}
+							{% for file_ in current_release.files.values() %}
 							<tr>
 								<td>{{file_.name}} ({{file_.md5_digest}})</td>
 								<td>{{file_.filetype}}</td>
@@ -96,7 +96,7 @@
 						<tbody>
 							{% for release in package.releases() %}
 							<tr>
-								<td>{{release.version}}</td>
+								<td><a href="{{handler.reverse_url('package_with_version', package.name, release.version)}}">{{release.version}}</a></td>
 								<td>{{locale.format_date(release.created_on)}}</td>
 							</tr>
 							{% end %}
