@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import httplib
+import mimetypes
 
 from tornado import web, httputil
 
@@ -102,4 +103,21 @@ class PackageHandler(web.RequestHandler):
                 current_release = package.release(version)
             self.render('package.html', package=package, current_release=current_release)
         except (mappers.NotFoundError, ValueError):
+            raise web.HTTPError(httplib.NOT_FOUND)
+
+class FileHandler(web.RequestHandler):
+
+    def initialize(self, files):
+        self.files = files
+
+    def get(self, id_):
+        try:
+            mime_type, encoding = mimetypes.guess_type(id_)
+            if mime_type:
+                self.set_header("Content-Type", mime_type)
+            else:
+                self.set_header("Content-Type", 'application/octet-stream')
+
+            self.write(self.files.get_by_name(id_))
+        except mappers.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)

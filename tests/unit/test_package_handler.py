@@ -7,6 +7,7 @@ from tornado import web, testing
 from hamcrest import *
 from pyDoubles.framework import *
 
+import viper
 from viper import handlers, mappers, entities
 
 NAME = u'viper'
@@ -43,11 +44,11 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
 
         return web.Application([
-                web.url(r'/packages/(?P<id_>[a-zA-Z0-9]+)',
+                web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
                     handlers.PackageHandler, dict(packages=self.packages),
                     name='package'
                 ),
-                web.url(r'/packages/(?P<id_>[a-zA-Z0-9.-]+)/(?P<version>[a-zA-Z0-9.-]+)',
+                web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
                     handlers.PackageHandler, dict(packages=self.packages),
                     name='package_with_version'
                 )
@@ -94,11 +95,11 @@ class TestPackageHandlerWithSpecifiedVersion(testing.AsyncHTTPTestCase):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
 
         return web.Application([
-                web.url(r'/packages/(?P<id_>[a-zA-Z0-9]+)',
+                web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
                     handlers.PackageHandler, dict(packages=self.packages),
                     name='package'
                 ),
-                web.url(r'/packages/(?P<id_>[a-zA-Z0-9.-]+)/(?P<version>[a-zA-Z0-9.-]+)',
+                web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
                     handlers.PackageHandler, dict(packages=self.packages),
                     name='package_with_version'
                 )

@@ -72,7 +72,7 @@
 						<tbody>
 							{% for file_ in current_release.files.values() %}
 							<tr>
-								<td>{{file_.name}} ({{file_.md5_digest}})</td>
+								<td><a href="{{handler.reverse_url('file', file_.name)}}">{{file_.name}}</a> ({{file_.md5_digest}})</td>
 								<td>{{file_.filetype}}</td>
 							</tr>
 							{% end %}
