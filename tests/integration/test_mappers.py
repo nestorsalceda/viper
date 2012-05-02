@@ -64,6 +64,19 @@ class TestPackageMapper(_TestMapper):
         with assert_raises(mappers.NotFoundError):
             self.mapper.get_by_name(NAME)
 
+    def test_get_all_packages(self):
+        new = Package(NAME)
+        self.mapper.store(new)
+
+        all_packages = self.mapper.all()
+
+        assert_that(list(all_packages), is_([new]))
+
+    def test_get_all_packages_without_packages(self):
+        all_packages = self.mapper.all()
+
+        assert_that(list(all_packages), is_([]))
+
     def cleanup(self):
         self.database.drop_collection(self.database.packages)
 

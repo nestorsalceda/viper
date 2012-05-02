@@ -1,0 +1,11 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Viper Distutils Index</title>
+	</head>
+	<body>
+	{% for package in packages %}
+	<a href="{{handler.reverse_url('distutils_package', package.name)}}" title="{{package.name}}">{{package.name}}</a>
+	{% end %}
+	</body>
+</html>

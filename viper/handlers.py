@@ -89,6 +89,15 @@ class DistutilsHandler(web.RequestHandler):
             del fields[field]
 
 
+class DistutilsDownloadHandler(web.RequestHandler):
+
+    def initialize(self, packages):
+        self.packages = packages
+
+    def get(self, id_=None):
+        if not id_:
+            self.render('distutils.html', packages=self.packages.all())
+
 class PackageHandler(web.RequestHandler):
 
     def initialize(self, packages):

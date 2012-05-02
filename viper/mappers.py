@@ -35,6 +35,9 @@ class PackageMapper(object):
 
         package.id_ = self.collection.save(query)
 
+    def all(self):
+        return self.collection.find()
+
 
 class FileMapper(object):
 

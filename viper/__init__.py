@@ -20,7 +20,16 @@ def application():
     return web.Application(
         [
             (r'/', handlers.MainHandler),
-            (r'/distutils', handlers.DistutilsHandler, dict(submit=submit, upload=upload)),
+            web.url(r'/distutils/',
+                handlers.DistutilsDownloadHandler, dict(packages=packages)
+            ),
+            web.url(r'/distutils/(?P<id_>%s)/' % identifier(),
+                handlers.DistutilsDownloadHandler, dict(packages=packages),
+                name='distutils_package'
+            ),
+            web.url(r'/distutils',
+                handlers.DistutilsHandler, dict(submit=submit, upload=upload)
+            ),
             web.url(r'/packages/(?P<id_>%s)' % identifier(),
                 handlers.PackageHandler, dict(packages=packages),
                 name='package'
