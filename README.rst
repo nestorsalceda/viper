@@ -1,3 +1,5 @@
+.. image:: https://secure.travis-ci.org/nestorsalceda/viper.png
+
 Viper Package Index
 ===================
 
