@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
+import os
 import httplib
 
-from tornado.testing import AsyncHTTPTestCase
+from tornado import web, testing
 from hamcrest import *
 
-from viper import application
+from viper import handlers
 
 URL = r'/'
 
 
-class TestMainHandler(AsyncHTTPTestCase):
+class TestMainHandler(testing.AsyncHTTPTestCase):
 
     def test_exists_main_page(self):
         response = self.fetch(URL)
@@ -18,4 +19,10 @@ class TestMainHandler(AsyncHTTPTestCase):
         assert_that(response.body, is_not(none()))
 
     def get_app(self):
-        return application()
+        return web.Application([
+                (r'/', handlers.MainHandler),
+            ],
+            debug=True,
+            template_path=os.path.join(os.path.dirname(handlers.__file__), 'templates'),
+            static_path=os.path.join(os.path.dirname(handlers.__file__), 'static')
+        )
