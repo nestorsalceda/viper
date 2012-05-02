@@ -16,7 +16,6 @@ def application():
     submit = commands.SubmitCommand(packages)
     upload = commands.FileUploadCommand(packages, files)
 
-
     return web.Application(
         [
             (r'/', handlers.MainHandler),
@@ -48,6 +47,7 @@ def application():
         static_path=os.path.join(os.path.dirname(__file__), 'static'),
         pypi_fallback="http://pypi.python.org/simple/%s/"
     )
+
 
 def identifier():
     return "[a-zA-Z0-9-_.]+"

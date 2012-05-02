@@ -121,6 +121,7 @@ class PackageHandler(web.RequestHandler):
         except (mappers.NotFoundError, ValueError):
             raise web.HTTPError(httplib.NOT_FOUND)
 
+
 class FileHandler(web.RequestHandler):
 
     def initialize(self, files):

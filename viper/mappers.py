@@ -11,8 +11,10 @@ from viper import entities
 class NotFoundError(Exception):
     pass
 
+
 class AlreadyExistsError(Exception):
     pass
+
 
 class PackageMapper(object):
 

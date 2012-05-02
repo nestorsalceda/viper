@@ -55,5 +55,3 @@ class TestFileHandler(testing.AsyncHTTPTestCase):
             template_path=os.path.join(os.path.dirname(handlers.__file__), 'templates'),
             static_path=os.path.join(os.path.dirname(handlers.__file__), 'static')
         )
-
-
