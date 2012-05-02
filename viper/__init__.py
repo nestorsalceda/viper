@@ -45,7 +45,8 @@ def application():
         ],
         debug=True,
         template_path=os.path.join(os.path.dirname(__file__), 'templates'),
-        static_path=os.path.join(os.path.dirname(__file__), 'static')
+        static_path=os.path.join(os.path.dirname(__file__), 'static'),
+        pypi_fallback="http://pypi.python.org/simple/%s/"
     )
 
 def identifier():

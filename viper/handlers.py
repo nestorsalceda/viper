@@ -95,8 +95,15 @@ class DistutilsDownloadHandler(web.RequestHandler):
         self.packages = packages
 
     def get(self, id_=None):
-        if not id_:
+        if id_:
+            try:
+                package = self.packages.get_by_name(id_)
+                self.render('distutils_package.html', package=package)
+            except mappers.NotFoundError:
+                self.redirect(self.settings.get('pypi_fallback') % id_)
+        else:
             self.render('distutils.html', packages=self.packages.all())
+
 
 class PackageHandler(web.RequestHandler):
 
