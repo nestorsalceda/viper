@@ -2,7 +2,7 @@
 
 import datetime
 
-from pymongo import son_manipulator
+from pymongo import son_manipulator, errors
 import gridfs
 
 from viper import entities
@@ -19,11 +19,19 @@ class AlreadyExistsError(Exception):
 class PackageMapper(object):
 
     def __init__(self, database):
-        database.add_son_manipulator(Manipulator())
-        self.collection = database.packages
+        self.database = database
+        self._collection = None
+
+    def _packages(self):
+        if self._collection is None:
+            self.database.add_son_manipulator(Manipulator())
+            self._collection = self.database.packages
+            self._collection.create_index(u'name', unique=True)
+
+        return self._collection
 
     def get_by_name(self, name):
-        result = self.collection.find_one({u'name': name})
+        result = self._packages().find_one({u'name': name})
         if not result:
             raise NotFoundError()
 
@@ -35,10 +43,13 @@ class PackageMapper(object):
             query['_id'] = package.id_
             package.last_updated_on = datetime.datetime.utcnow()
 
-        package.id_ = self.collection.save(query)
+        try:
+            package.id_ = self._packages().save(query, safe=True)
+        except errors.DuplicateKeyError:
+            raise AlreadyExistsError()
 
     def all(self):
-        return self.collection.find()
+        return self._packages().find()
 
 
 class FileMapper(object):

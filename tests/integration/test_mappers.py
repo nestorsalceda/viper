@@ -40,6 +40,11 @@ class TestPackageMapper(_TestMapper):
         retrieved = self.mapper.get_by_name(NAME)
         assert_that(retrieved, is_(new))
 
+    def test_insert_new_packages_with_same_twice_raises_already_exists_error(self):
+        self.mapper.store(Package(NAME))
+        with assert_raises(mappers.AlreadyExistsError):
+            self.mapper.store(Package(NAME))
+
     def test_update_package(self):
         new = Package(NAME)
         self.mapper.store(new)
