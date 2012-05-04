@@ -159,3 +159,23 @@ class TestSONManipulator(_TestMapper):
         self.database.drop_collection(self.database.packages)
 
         self.packages = mappers.PackageMapper(self.database)
+
+
+class TestPythonPackageIndex(object):
+
+    def test_exists_a_package(self):
+        package = self.pypi.get_by_name(u'tornado')
+
+        assert_that(package.is_from_pypi)
+        assert_that(package.name, is_(u'tornado'))
+        assert_that(package.releases(), all_of(
+            has_length(1),
+            has_item(has_property('author', u'Facebook'))
+        ))
+
+    def test_raise_error_unless_found(self):
+        with assert_raises(mappers.NotFoundError):
+            self.pypi.get_by_name(u'I-really-hope-this-package-does-not-exist')
+
+    def setup(self):
+        self.pypi = mappers.PythonPackageIndex()

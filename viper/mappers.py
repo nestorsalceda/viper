@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+import httplib
 import datetime
 
 from pymongo import son_manipulator, errors
 import gridfs
+
+from tornado import httpclient, escape
 
 from viper import entities
 
@@ -82,8 +85,33 @@ class FileMapper(object):
 
 class PythonPackageIndex(object):
 
+    URL = u'http://pypi.python.org/pypi/%s/json'
+
+    def __init__(self):
+        self._httpclient = httpclient.HTTPClient()
+
     def get_by_name(self, name):
-        pass
+        response = self._query_pypi(name)
+
+        package = entities.Package(name)
+        package.is_from_pypi = True
+        release = entities.Release(response['info'][u'version'])
+
+        for key, value in response['info'].iteritems():
+            if hasattr(release, key) and value != 'UNKNOWN':
+                setattr(release, key, value)
+
+        package.store_release(release)
+        return package
+
+    def _query_pypi(self, name):
+        try:
+            response = self._httpclient.fetch(self.URL % name)
+            return escape.json_decode(response.body)
+        except httpclient.HTTPError as error:
+            if error.code == httplib.NOT_FOUND:
+                raise NotFoundError()
+
 
 class Manipulator(son_manipulator.SONManipulator):
 
