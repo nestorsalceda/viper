@@ -51,6 +51,9 @@ class PackageMapper(object):
     def all(self):
         return self._packages().find()
 
+    def exists(self, name):
+        pass
+
 
 class FileMapper(object):
 
@@ -76,6 +79,11 @@ class FileMapper(object):
 
         return self._files().get(filename).read()
 
+
+class PythonPackageIndex(object):
+
+    def get_by_name(self, name):
+        pass
 
 class Manipulator(son_manipulator.SONManipulator):
 

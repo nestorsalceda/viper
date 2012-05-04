@@ -107,8 +107,9 @@ class DistutilsDownloadHandler(web.RequestHandler):
 
 class PackageHandler(web.RequestHandler):
 
-    def initialize(self, packages):
+    def initialize(self, packages, pypi):
         self.packages = packages
+        self.pypi = pypi
 
     def get(self, id_, version=None):
         try:
@@ -119,6 +120,21 @@ class PackageHandler(web.RequestHandler):
                 current_release = package.release(version)
             self.render('package.html', package=package, current_release=current_release)
         except (mappers.NotFoundError, ValueError):
+            raise web.HTTPError(httplib.NOT_FOUND)
+
+    def post(self, id_, version=None):
+        if self.packages.exists(id_):
+            raise web.HTTPError(httplib.CONFLICT)
+
+        package = self._get_from_pypi_or_abort(id_)
+        self.packages.store(package)
+        self.set_status(httplib.CREATED)
+        self.set_header('Location', self.reverse_url('package', id_))
+
+    def _get_from_pypi_or_abort(self, id_):
+        try:
+            return self.pypi.get_by_name(id_)
+        except mappers.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
 
 

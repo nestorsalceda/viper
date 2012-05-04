@@ -50,6 +50,7 @@ class Package(object):
         self.name = name
         self.created_on = now
         self.last_updated_on = now
+        self.is_from_pypi= False
         self._releases = {}
 
     def store_release(self, release):

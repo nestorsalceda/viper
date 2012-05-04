@@ -21,6 +21,7 @@ class TestPackage(object):
         assert_that(self.package.name, is_(NAME))
         assert_that(self.package.created_on, is_(datetime.datetime))
         assert_that(self.package.last_updated_on, is_(datetime.datetime))
+        assert_that(self.package.is_from_pypi, is_(False))
 
     @raises(ValueError)
     def test_getting_inexistent_release_raises_error(self):

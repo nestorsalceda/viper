@@ -12,6 +12,7 @@ def application():
 
     packages = mappers.PackageMapper(database)
     files = mappers.FileMapper(database)
+    pypi = mappers.PythonPackageIndex()
 
     submit = commands.SubmitCommand(packages)
     upload = commands.FileUploadCommand(packages, files)
@@ -30,11 +31,11 @@ def application():
                 handlers.DistutilsHandler, dict(submit=submit, upload=upload)
             ),
             web.url(r'/packages/(?P<id_>%s)' % identifier(),
-                handlers.PackageHandler, dict(packages=packages),
+                handlers.PackageHandler, dict(packages=packages, pypi=pypi),
                 name='package'
             ),
             web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (identifier(), identifier()),
-                handlers.PackageHandler, dict(packages=packages),
+                handlers.PackageHandler, dict(packages=packages, pypi=pypi),
                 name='package_with_version'
             ),
             web.url(r'/files/(?P<id_>%s)' % identifier(),

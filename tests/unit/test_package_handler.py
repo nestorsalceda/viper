@@ -37,19 +37,43 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
 
         assert_that(response.code, is_(httplib.NOT_FOUND))
 
+    def test_cache_a_package_from_pypi(self):
+        when(self.pypi.get_by_name).then_return(self._package())
+
+        response = self.fetch(self._url_for(NAME), method='POST', body='')
+
+        assert_that(response.code, is_(httplib.CREATED))
+        assert_that(response.headers, has_entry('Location', '/packages/%s' % NAME))
+        assert_that_method(self.packages.store).was_called()
+
+    def test_cache_a_non_existing_package_from_pypi_returns_not_found(self):
+        when(self.pypi.get_by_name).then_raise(mappers.NotFoundError())
+
+        response = self.fetch(self._url_for(NAME), method='POST', body='')
+
+        assert_that(response.code, is_(httplib.NOT_FOUND))
+
+    def test_cache_a_package_from_pypi_returns_conflict_if_already_exists(self):
+        when(self.packages.exists).then_return(True)
+
+        response = self.fetch(self._url_for(NAME), method='POST', body='')
+
+        assert_that(response.code, is_(httplib.CONFLICT))
+
     def _url_for(self, id_):
         return '/packages/%s' % id_
 
     def get_app(self):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
+        self.pypi = spy(mappers.PythonPackageIndex())
 
         return web.Application([
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
-                    handlers.PackageHandler, dict(packages=self.packages),
+                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi),
                     name='package'
                 ),
                 web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
-                    handlers.PackageHandler, dict(packages=self.packages),
+                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi),
                     name='package_with_version'
                 )
             ],
@@ -93,14 +117,15 @@ class TestPackageHandlerWithSpecifiedVersion(testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
+        self.pypi = spy(mappers.PythonPackageIndex())
 
         return web.Application([
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
-                    handlers.PackageHandler, dict(packages=self.packages),
+                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi),
                     name='package'
                 ),
                 web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
-                    handlers.PackageHandler, dict(packages=self.packages),
+                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi),
                     name='package_with_version'
                 )
             ],
