@@ -55,7 +55,7 @@ class PackageMapper(object):
         return self._packages().find()
 
     def exists(self, name):
-        pass
+        return self._packages().find({'name': name}).count() != 0
 
 
 class FileMapper(object):

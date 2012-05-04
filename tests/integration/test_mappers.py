@@ -82,6 +82,16 @@ class TestPackageMapper(_TestMapper):
 
         assert_that(list(all_packages), is_([]))
 
+    def test_exists_package(self):
+        new = Package(NAME)
+
+        self.mapper.store(new)
+
+        assert_that(self.mapper.exists(NAME))
+
+    def test_not_exists_package(self):
+        assert_that(self.mapper.exists(NAME), is_(False))
+
     def cleanup(self):
         self.database.drop_collection(self.database.packages)
 
