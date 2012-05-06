@@ -187,5 +187,35 @@ class TestPythonPackageIndex(object):
         with assert_raises(mappers.NotFoundError):
             self.pypi.get_by_name(u'I-really-hope-this-package-does-not-exist')
 
+    def test_download_files_in_url_list(self):
+        files = self.pypi.download_files(u'Flask')
+
+        assert_that(files, all_of(
+            has_length(1),
+            has_item(has_entries(
+                file=all_of(
+                    has_property(u'name', starts_with(u'Flask')),
+                    has_property(u'filetype', u'sdist'),
+                    has_property(u'md5_digest', is_not(none()))
+                ),
+                content=is_not(none())
+            ))
+        ))
+
+    def test_download_files_in_download_url_if_url_list_is_empty(self):
+        files = self.pypi.download_files(u'tornado')
+
+        assert_that(files, all_of(
+            has_length(1),
+            has_item(has_entries(
+                file=all_of(
+                    has_property(u'name', starts_with(u'tornado')),
+                    has_property(u'filetype', u'sdist'),
+                    has_property(u'md5_digest', none())
+                ),
+                content=is_not(none())
+            ))
+        ))
+
     def setup(self):
         self.pypi = mappers.PythonPackageIndex()

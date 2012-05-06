@@ -2,6 +2,7 @@
 
 import httplib
 import datetime
+import urlparse
 
 from pymongo import son_manipulator, errors
 import gridfs
@@ -113,8 +114,24 @@ class PythonPackageIndex(object):
                 raise NotFoundError()
 
     def download_files(self, name):
-        pass
+        response = self._query_pypi(name)
+        result = []
 
+        for url in response[u'urls']:
+            result.append({
+                u'file':  entities.File(url[u'filename'], url[u'packagetype'], url[u'md5_digest']),
+                u'content': self._httpclient.fetch(url[u'url']).body
+            })
+
+        if not result:
+            url = response[u'info'][u'download_url']
+            filename = urlparse.urlparse(url)[2].split(u'/')[-1]
+            result.append({
+                u'file': entities.File(filename, u'sdist', None),
+                u'content': self._httpclient.fetch(url).body
+            })
+
+        return result
 
 class Manipulator(son_manipulator.SONManipulator):
 
