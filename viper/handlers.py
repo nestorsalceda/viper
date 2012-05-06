@@ -107,9 +107,10 @@ class DistutilsDownloadHandler(web.RequestHandler):
 
 class PackageHandler(web.RequestHandler):
 
-    def initialize(self, packages, pypi):
+    def initialize(self, packages, pypi, files):
         self.packages = packages
         self.pypi = pypi
+        self.files = files
 
     def get(self, id_, version=None):
         try:
@@ -127,6 +128,12 @@ class PackageHandler(web.RequestHandler):
             raise web.HTTPError(httplib.CONFLICT)
 
         package = self._get_from_pypi_or_abort(id_)
+
+        downloads = self.pypi.download_files(id_)
+        for download in downloads:
+            package.last_release().add_file(download['file'])
+            self.files.store(download['file'].name, download['content'])
+
         self.packages.store(package)
         self.set_status(httplib.CREATED)
         self.set_header('Location', self.reverse_url('package', id_))

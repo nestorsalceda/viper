@@ -31,11 +31,11 @@ def application():
                 handlers.DistutilsHandler, dict(submit=submit, upload=upload)
             ),
             web.url(r'/packages/(?P<id_>%s)' % identifier(),
-                handlers.PackageHandler, dict(packages=packages, pypi=pypi),
+                handlers.PackageHandler, dict(packages=packages, pypi=pypi, files=files),
                 name='package'
             ),
             web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (identifier(), identifier()),
-                handlers.PackageHandler, dict(packages=packages, pypi=pypi),
+                handlers.PackageHandler, dict(packages=packages, pypi=pypi, files=files),
                 name='package_with_version'
             ),
             web.url(r'/files/(?P<id_>%s)' % identifier(),

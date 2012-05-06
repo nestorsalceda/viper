@@ -112,6 +112,9 @@ class PythonPackageIndex(object):
             if error.code == httplib.NOT_FOUND:
                 raise NotFoundError()
 
+    def download_files(self, name):
+        pass
+
 
 class Manipulator(son_manipulator.SONManipulator):
 
