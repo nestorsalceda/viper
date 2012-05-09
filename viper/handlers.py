@@ -131,7 +131,7 @@ class PackageHandler(web.RequestHandler):
         self.new_package = self._get_from_pypi_or_abort(id_)
         self.packages.store(self.new_package)
 
-        self.pypi.download_files(id_, self._on_download_finished)
+        self.pypi.download_files(id_, self._on_file_downloaded)
 
         self.set_status(httplib.CREATED)
         self.set_header('Location', self.reverse_url('package', id_))
@@ -142,7 +142,7 @@ class PackageHandler(web.RequestHandler):
         except mappers.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
 
-    def _on_download_finished(self, file_, content):
+    def _on_file_downloaded(self, file_, content):
         logging.info('Downloaded %s', file_.name)
         self.files.store(file_.name, content)
         self.new_package.last_release().add_file(file_)
