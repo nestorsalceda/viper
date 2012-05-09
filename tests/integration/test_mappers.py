@@ -5,6 +5,7 @@ from nose.tools import assert_raises
 
 import pymongo
 import gridfs
+from tornado import testing, ioloop
 
 from viper import mappers
 from viper.entities import Package, Release, File
@@ -171,7 +172,7 @@ class TestSONManipulator(_TestMapper):
         self.packages = mappers.PackageMapper(self.database)
 
 
-class TestPythonPackageIndex(object):
+class TestPythonPackageIndex(testing.AsyncTestCase):
 
     def test_exists_a_package(self):
         package = self.pypi.get_by_name(u'tornado')
@@ -188,34 +189,36 @@ class TestPythonPackageIndex(object):
             self.pypi.get_by_name(u'I-really-hope-this-package-does-not-exist')
 
     def test_download_files_in_url_list(self):
-        files = self.pypi.download_files(u'Flask')
+        self.pypi.download_files(u'Flask', self._assert_that_flask_was_downloaded)
+        self.wait()
 
-        assert_that(files, all_of(
-            has_length(1),
-            has_item(has_entries(
-                file=all_of(
-                    has_property(u'name', starts_with(u'Flask')),
-                    has_property(u'filetype', u'sdist'),
-                    has_property(u'md5_digest', is_not(none()))
-                ),
-                content=is_not(none())
-            ))
+    def _assert_that_flask_was_downloaded(self, file_, content):
+        assert_that(file_, all_of(
+            has_property(u'name', starts_with(u'Flask')),
+            has_property(u'filetype', u'sdist'),
+            has_property(u'md5_digest', is_not(none()))
         ))
+
+        assert_that(content, is_not(none()))
+        self.stop()
 
     def test_download_files_in_download_url_if_url_list_is_empty(self):
-        files = self.pypi.download_files(u'tornado')
+        self.pypi.download_files(u'tornado', self._assert_that_tornado_was_downloaded)
+        self.wait()
 
-        assert_that(files, all_of(
-            has_length(1),
-            has_item(has_entries(
-                file=all_of(
-                    has_property(u'name', starts_with(u'tornado')),
-                    has_property(u'filetype', u'sdist'),
-                    has_property(u'md5_digest', none())
-                ),
-                content=is_not(none())
-            ))
+    def _assert_that_tornado_was_downloaded(self, file_, content):
+        assert_that(file_, all_of(
+            has_property(u'name', starts_with(u'tornado')),
+            has_property(u'filetype', u'sdist'),
+            has_property(u'md5_digest', none())
         ))
 
-    def setup(self):
+        assert_that(content, is_not(none()))
+        self.stop()
+
+    def setUp(self):
+        super(TestPythonPackageIndex, self).setUp()
         self.pypi = mappers.PythonPackageIndex()
+
+    def get_new_ioloop(self):
+        return ioloop.IOLoop.instance()

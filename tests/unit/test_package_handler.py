@@ -39,14 +39,12 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
 
     def test_cache_a_package_from_pypi(self):
         when(self.pypi.get_by_name).then_return(self._package())
-        when(self.pypi.download_files).then_return([{'file': entities.File(NAME, None, None), 'content': ''}])
 
         response = self.fetch(self._url_for(NAME), method='POST', body='')
 
         assert_that(response.code, is_(httplib.CREATED))
         assert_that(response.headers, has_entry('Location', '/packages/%s' % NAME))
         assert_that_method(self.packages.store).was_called()
-        assert_that_method(self.files.store).was_called()
 
     def test_cache_a_non_existing_package_from_pypi_returns_not_found(self):
         when(self.pypi.get_by_name).then_raise(mappers.NotFoundError())

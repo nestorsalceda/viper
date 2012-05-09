@@ -2,6 +2,7 @@
 
 import httplib
 import mimetypes
+import logging
 
 from tornado import web, httputil
 
@@ -127,14 +128,11 @@ class PackageHandler(web.RequestHandler):
         if self.packages.exists(id_):
             raise web.HTTPError(httplib.CONFLICT)
 
-        package = self._get_from_pypi_or_abort(id_)
+        self.new_package = self._get_from_pypi_or_abort(id_)
+        self.packages.store(self.new_package)
 
-        downloads = self.pypi.download_files(id_)
-        for download in downloads:
-            package.last_release().add_file(download['file'])
-            self.files.store(download['file'].name, download['content'])
+        self.pypi.download_files(id_, self._on_download_finished)
 
-        self.packages.store(package)
         self.set_status(httplib.CREATED)
         self.set_header('Location', self.reverse_url('package', id_))
 
@@ -143,6 +141,12 @@ class PackageHandler(web.RequestHandler):
             return self.pypi.get_by_name(id_)
         except mappers.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
+
+    def _on_download_finished(self, file_, content):
+        logging.info('Downloaded %s', file_.name)
+        self.files.store(file_.name, content)
+        self.new_package.last_release().add_file(file_)
+        self.packages.store(self.new_package)
 
 
 class FileHandler(web.RequestHandler):

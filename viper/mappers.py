@@ -3,6 +3,7 @@
 import httplib
 import datetime
 import urlparse
+import functools
 
 from pymongo import son_manipulator, errors
 import gridfs
@@ -113,25 +114,31 @@ class PythonPackageIndex(object):
             if error.code == httplib.NOT_FOUND:
                 raise NotFoundError()
 
-    def download_files(self, name):
-        response = self._query_pypi(name)
-        result = []
+    def download_files(self, name, on_file_downloaded):
 
-        for url in response[u'urls']:
-            result.append({
-                u'file':  entities.File(url[u'filename'], url[u'packagetype'], url[u'md5_digest']),
-                u'content': self._httpclient.fetch(url[u'url']).body
-            })
+        def _on_file_downloaded_from_url(url, response):
+            on_file_downloaded(
+                entities.File(url[u'filename'], url[u'packagetype'], url[u'md5_digest']),
+                response.body
+            )
 
-        if not result:
-            url = response[u'info'][u'download_url']
+        def _on_file_downloaded_from_download_url(url, response):
             filename = urlparse.urlparse(url)[2].split(u'/')[-1]
-            result.append({
-                u'file': entities.File(filename, u'sdist', None),
-                u'content': self._httpclient.fetch(url).body
-            })
+            on_file_downloaded(
+                entities.File(filename, u'sdist', None),
+                response.body
+            )
 
-        return result
+        response = self._query_pypi(name)
+        client = httpclient.AsyncHTTPClient()
+
+        if not response[u'urls']:
+            url = response[u'info'][u'download_url']
+            client.fetch(url, functools.partial(_on_file_downloaded_from_download_url, url))
+        else:
+            for url in response[u'urls']:
+                client.fetch(url[u'url'], functools.partial(_on_file_downloaded_from_url, url))
+
 
 class Manipulator(son_manipulator.SONManipulator):
 
