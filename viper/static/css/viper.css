@@ -2,3 +2,26 @@ body {
 	padding-top: 60px;
 	padding-bottom: 40px;
 }
+
+li.package {
+	border-bottom: 1px solid #eee;
+	min-height: 20px;
+	padding: 19px;
+	margin-bottom: 5px;
+}
+
+li.package a {
+	font-weight: bold;
+	font-size: 21px;
+}
+
+li.package p {
+	margin: 9px 0 0 0;
+}
+
+li.package:hover {
+	background-color: #f5f5f5;
+	-webkit-border-radius: 4px;
+	   -moz-border-radius: 4px;
+	        border-radius: 4px;
+}

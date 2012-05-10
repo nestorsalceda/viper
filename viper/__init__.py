@@ -30,6 +30,9 @@ def application():
             web.url(r'/distutils',
                 handlers.DistutilsHandler, dict(submit=submit, upload=upload)
             ),
+            web.url(r'/packages',
+                handlers.AllPackagesHandler, dict(packages=packages)
+            ),
             web.url(r'/packages/(?P<id_>%s)' % identifier(),
                 handlers.PackageHandler, dict(packages=packages, pypi=pypi, files=files),
                 name='package'

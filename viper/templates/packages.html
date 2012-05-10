@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}
+All packages · Viper
+{% end %}
+
+{% block content %}
+<div class="row">
+	<div class="span12">
+		<div class="page-header">
+			<h1>All packages registered <small>({{total}})</small></h1>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="span12">
+		<ul class="unstyled">
+			{% for package in packages %}
+				<li class="package">
+					<a href="{{handler.reverse_url('package', package.name)}}">{{package.name}}</a>
+					<p>{{package.last_release().summary}}</p>
+				</li>
+			{% end %}
+		</ul>
+	</div>
+</div>
+{% end %}

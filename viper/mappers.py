@@ -5,7 +5,7 @@ import datetime
 import urlparse
 import functools
 
-from pymongo import son_manipulator, errors
+from pymongo import son_manipulator, errors, ASCENDING
 import gridfs
 
 from tornado import httpclient, escape
@@ -54,7 +54,10 @@ class PackageMapper(object):
             raise AlreadyExistsError()
 
     def all(self):
-        return self._packages().find()
+        return self._packages().find(sort=[('name', ASCENDING)])
+
+    def count_all(self):
+        return self.all().count()
 
     def exists(self, name):
         return self._packages().find({'name': name}).count() != 0

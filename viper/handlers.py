@@ -117,6 +117,20 @@ class DistutilsDownloadHandler(web.RequestHandler):
         pass
 
 
+class AllPackagesHandler(web.RequestHandler):
+
+    def initialize(self, packages):
+        self.packages = packages
+
+    def get(self):
+        packages = self.packages.all()
+        total = self._count(packages)
+        self.render('packages.html', packages=packages, total=total)
+
+    def _count(self, packages):
+        return len(packages) if hasattr(packages, '__len__') else packages.count()
+
+
 class PackageHandler(web.RequestHandler):
 
     def initialize(self, packages, pypi, files):
