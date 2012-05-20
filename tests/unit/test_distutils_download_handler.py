@@ -81,6 +81,10 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
                     handlers.DistutilsDownloadHandler, dict(packages=self.packages),
                     name='distutils_package'
                 ),
+                web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
+                    handlers.PackageHandler, dict(packages=self.packages, pypi=None, files=None),
+                    name='package'
+                ),
                 web.url(r'/files/(?P<id_>%s)' % viper.identifier(),
                     handlers.FileHandler, dict(files=None),
                     name='file'

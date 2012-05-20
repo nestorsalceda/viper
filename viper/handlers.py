@@ -4,7 +4,7 @@ import httplib
 import mimetypes
 import logging
 
-from tornado import web, httputil
+from tornado import web, httputil, httpclient
 
 from viper import commands, mappers
 
@@ -94,6 +94,7 @@ class DistutilsDownloadHandler(web.RequestHandler):
 
     def initialize(self, packages):
         self.packages = packages
+        self.request_download = httpclient.AsyncHTTPClient()
 
     def get(self, id_=None):
         if id_:
@@ -101,9 +102,19 @@ class DistutilsDownloadHandler(web.RequestHandler):
                 package = self.packages.get_by_name(id_)
                 self.render('distutils_package.html', package=package)
             except mappers.NotFoundError:
+                self._queue_package_for_caching(id_)
                 self.redirect(self.settings.get('pypi_fallback') % id_)
         else:
             self.render('distutils.html', packages=self.packages.all())
+
+    def _queue_package_for_caching(self, id_):
+        self.request_download.fetch(
+            'http://%s%s' % (self.request.host, self.reverse_url('package', id_)),
+            self._no_operation, method='POST', body=''
+        )
+
+    def _no_operation(self, response):
+        pass
 
 
 class PackageHandler(web.RequestHandler):
