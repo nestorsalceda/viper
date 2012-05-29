@@ -8,7 +8,7 @@ from hamcrest import *
 from pyDoubles.framework import *
 
 import viper
-from viper import handlers, mappers, entities
+from viper import handlers, mappers, entities, cache
 
 NAME = u'viper'
 VERSION = u'0.1'
@@ -38,16 +38,14 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
         assert_that(response.code, is_(httplib.NOT_FOUND))
 
     def test_cache_a_package_from_pypi(self):
-        when(self.pypi.get_by_name).then_return(self._package())
-
         response = self.fetch(self._url_for(NAME), method='POST', body='')
 
         assert_that(response.code, is_(httplib.CREATED))
         assert_that(response.headers, has_entry('Location', '/packages/%s' % NAME))
-        assert_that_method(self.packages.store).was_called()
+        assert_that_method(self.cache.cache_package).was_called()
 
     def test_cache_a_non_existing_package_from_pypi_returns_not_found(self):
-        when(self.pypi.get_by_name).then_raise(mappers.NotFoundError())
+        when(self.cache.cache_package).then_raise(mappers.NotFoundError())
 
         response = self.fetch(self._url_for(NAME), method='POST', body='')
 
@@ -65,16 +63,15 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
-        self.pypi = spy(mappers.PythonPackageIndex())
-        self.files = spy(mappers.FileMapper(empty_stub()))
+        self.cache = spy(cache.Cache(self.packages, None, None))
 
         return web.Application([
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
-                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi, files=self.files),
+                    handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package'
                 ),
                 web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
-                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi, files=self.files),
+                    handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package_with_version'
                 )
             ],
@@ -118,16 +115,15 @@ class TestPackageHandlerWithSpecifiedVersion(testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
-        self.pypi = spy(mappers.PythonPackageIndex())
-        self.files = spy(mappers.FileMapper(empty_stub()))
+        self.cache = spy(cache.Cache(self.packages, None, None))
 
         return web.Application([
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
-                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi, files=self.files),
+                    handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package'
                 ),
                 web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
-                    handlers.PackageHandler, dict(packages=self.packages, pypi=self.pypi, files=self.files),
+                    handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package_with_version'
                 )
             ],

@@ -2,7 +2,6 @@
 
 import httplib
 import mimetypes
-import logging
 
 from tornado import web, httputil, httpclient
 
@@ -133,10 +132,9 @@ class AllPackagesHandler(web.RequestHandler):
 
 class PackageHandler(web.RequestHandler):
 
-    def initialize(self, packages, pypi, files):
+    def initialize(self, packages, cache):
         self.packages = packages
-        self.pypi = pypi
-        self.files = files
+        self.cache = cache
 
     def get(self, id_, version=None):
         try:
@@ -153,25 +151,12 @@ class PackageHandler(web.RequestHandler):
         if self.packages.exists(id_):
             raise web.HTTPError(httplib.CONFLICT)
 
-        self.new_package = self._get_from_pypi_or_abort(id_)
-        self.packages.store(self.new_package)
-
-        self.pypi.download_files(id_, self._on_file_downloaded)
-
-        self.set_status(httplib.CREATED)
-        self.set_header('Location', self.reverse_url('package', id_))
-
-    def _get_from_pypi_or_abort(self, id_):
         try:
-            return self.pypi.get_by_name(id_)
+            self.cache.cache_package(id_)
+            self.set_status(httplib.CREATED)
+            self.set_header('Location', self.reverse_url('package', id_))
         except mappers.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
-
-    def _on_file_downloaded(self, file_, content):
-        logging.info('Downloaded %s', file_.name)
-        self.files.store(file_.name, content)
-        self.new_package.last_release().add_file(file_)
-        self.packages.store(self.new_package)
 
 
 class FileHandler(web.RequestHandler):

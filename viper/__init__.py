@@ -4,7 +4,7 @@ import os
 from tornado import web
 import pymongo
 
-from viper import handlers, commands, mappers
+from viper import handlers, commands, mappers, cache as c
 
 
 def application():
@@ -16,6 +16,8 @@ def application():
 
     submit = commands.SubmitCommand(packages)
     upload = commands.FileUploadCommand(packages, files)
+
+    cache = c.Cache(packages, files, pypi)
 
     return web.Application(
         [
@@ -34,11 +36,11 @@ def application():
                 handlers.AllPackagesHandler, dict(packages=packages)
             ),
             web.url(r'/packages/(?P<id_>%s)' % identifier(),
-                handlers.PackageHandler, dict(packages=packages, pypi=pypi, files=files),
+                handlers.PackageHandler, dict(packages=packages, cache=cache),
                 name='package'
             ),
             web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (identifier(), identifier()),
-                handlers.PackageHandler, dict(packages=packages, pypi=pypi, files=files),
+                handlers.PackageHandler, dict(packages=packages, cache=cache),
                 name='package_with_version'
             ),
             web.url(r'/files/(?P<id_>%s)' % identifier(),
