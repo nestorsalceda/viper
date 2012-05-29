@@ -2,8 +2,9 @@
 
 import httplib
 import mimetypes
+import functools
 
-from tornado import web, httputil, httpclient
+from tornado import web, httputil, ioloop
 
 from viper import commands, mappers
 
@@ -91,9 +92,9 @@ class DistutilsHandler(web.RequestHandler):
 
 class DistutilsDownloadHandler(web.RequestHandler):
 
-    def initialize(self, packages):
+    def initialize(self, packages, cache):
         self.packages = packages
-        self.request_download = httpclient.AsyncHTTPClient()
+        self.cache = cache
 
     def get(self, id_=None):
         if id_:
@@ -107,13 +108,7 @@ class DistutilsDownloadHandler(web.RequestHandler):
             self.render('distutils.html', packages=self.packages.all())
 
     def _queue_package_for_caching(self, id_):
-        self.request_download.fetch(
-            'http://%s%s' % (self.request.host, self.reverse_url('package', id_)),
-            self._no_operation, method='POST', body=''
-        )
-
-    def _no_operation(self, response):
-        pass
+        ioloop.IOLoop.instance().add_callback(functools.partial(self.cache.cache_package, id_))
 
 
 class AllPackagesHandler(web.RequestHandler):

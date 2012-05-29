@@ -23,10 +23,10 @@ def application():
         [
             (r'/', handlers.MainHandler),
             web.url(r'/distutils/',
-                handlers.DistutilsDownloadHandler, dict(packages=packages)
+                handlers.DistutilsDownloadHandler, dict(packages=packages, cache=cache)
             ),
             web.url(r'/distutils/(?P<id_>%s)/' % identifier(),
-                handlers.DistutilsDownloadHandler, dict(packages=packages),
+                handlers.DistutilsDownloadHandler, dict(packages=packages, cache=cache),
                 name='distutils_package'
             ),
             web.url(r'/distutils',

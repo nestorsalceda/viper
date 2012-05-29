@@ -9,7 +9,7 @@ from pyDoubles.framework import *
 from hamcrest import *
 
 import viper
-from viper import handlers, mappers, entities
+from viper import handlers, mappers, entities, cache
 
 NAME = u'viper'
 VERSION = u'0.1dev'
@@ -71,18 +71,19 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
 
     def get_app(self):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
+        self.cache = spy(cache.Cache(self.packages, None, None))
         self.pypi_fallback = "http://pypi.python.org/simple/%s/"
 
         return web.Application([
                 web.url(r'/distutils/',
-                    handlers.DistutilsDownloadHandler, dict(packages=self.packages)
+                    handlers.DistutilsDownloadHandler, dict(packages=self.packages, cache=self.cache)
                 ),
                 web.url(r'/distutils/(?P<id_>%s)/' % viper.identifier(),
-                    handlers.DistutilsDownloadHandler, dict(packages=self.packages),
+                    handlers.DistutilsDownloadHandler, dict(packages=self.packages, cache=self.cache),
                     name='distutils_package'
                 ),
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
-                    handlers.PackageHandler, dict(packages=self.packages, pypi=None, files=None),
+                    handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package'
                 ),
                 web.url(r'/files/(?P<id_>%s)' % viper.identifier(),
