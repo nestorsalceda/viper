@@ -3,3 +3,11 @@
 {% block title %}
 Welcome · Viper
 {% end %}
+
+{% block content %}
+<div class="hero-unit">
+	<h1>Viper</h1>
+	<p>Viper is an awesome <a href="http://pypi.python.org">Python Package Index</a> implementation.</p>
+	<p><a href="{{reverse_url('packages')}}" class="btn btn-primary btn-large">View all packages registered &raquo;</a></p>
+</div>
+{% end %}

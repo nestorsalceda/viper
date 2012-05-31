@@ -33,7 +33,8 @@ def application():
                 handlers.DistutilsHandler, dict(submit=submit, upload=upload)
             ),
             web.url(r'/packages',
-                handlers.AllPackagesHandler, dict(packages=packages)
+                handlers.AllPackagesHandler, dict(packages=packages),
+                name='packages'
             ),
             web.url(r'/packages/(?P<id_>%s)' % identifier(),
                 handlers.PackageHandler, dict(packages=packages, cache=cache),
