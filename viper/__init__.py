@@ -7,8 +7,11 @@ import pymongo
 from viper import handlers, commands, mappers, cache as c
 
 
-def application():
-    database = pymongo.Connection()['viper_package_index']
+def application(**settings):
+    database = pymongo.Connection(
+        settings['mongodb']['host'],
+        settings['mongodb']['port']
+    )['viper_package_index']
 
     packages = mappers.PackageMapper(database)
     files = mappers.FileMapper(database)
