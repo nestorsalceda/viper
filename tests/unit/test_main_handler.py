@@ -21,6 +21,10 @@ class TestMainHandler(testing.AsyncHTTPTestCase):
     def get_app(self):
         return web.Application([
                 (r'/', handlers.MainHandler),
+                web.url(r'/packages',
+                    handlers.AllPackagesHandler, dict(packages=None),
+                    name='packages'
+                )
             ],
             debug=True,
             template_path=os.path.join(os.path.dirname(handlers.__file__), 'templates'),
