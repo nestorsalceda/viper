@@ -7,7 +7,7 @@ import pymongo
 import gridfs
 from tornado import testing, ioloop
 
-from viper import mappers
+from viper import mappers, errors
 from viper.entities import Package, Release, File
 
 
@@ -43,7 +43,7 @@ class TestPackageMapper(_TestMapper):
 
     def test_insert_new_packages_with_same_twice_raises_already_exists_error(self):
         self.mapper.store(Package(NAME))
-        with assert_raises(mappers.AlreadyExistsError):
+        with assert_raises(errors.AlreadyExistsError):
             self.mapper.store(Package(NAME))
 
     def test_update_package(self):
@@ -67,7 +67,7 @@ class TestPackageMapper(_TestMapper):
         assert_that(updated.last_updated_on, is_(greater_than(new.last_updated_on)))
 
     def test_raise_error_unless_found(self):
-        with assert_raises(mappers.NotFoundError):
+        with assert_raises(errors.NotFoundError):
             self.mapper.get_by_name(NAME)
 
     def test_get_all_packages(self):
@@ -110,11 +110,11 @@ class TestFileMapper(_TestMapper):
     def test_an_existent_file_cannot_be_upgraded(self):
         self.mapper.store(NAME, FILE_CONTENT)
 
-        with assert_raises(mappers.AlreadyExistsError):
+        with assert_raises(errors.AlreadyExistsError):
             self.mapper.store(NAME, FILE_CONTENT)
 
     def test_raise_error_unless_found(self):
-        with assert_raises(mappers.NotFoundError):
+        with assert_raises(errors.NotFoundError):
             self.mapper.get_by_name(NAME)
 
     def cleanup(self):
@@ -185,7 +185,7 @@ class TestPythonPackageIndex(testing.AsyncTestCase):
         ))
 
     def test_raise_error_unless_found(self):
-        with assert_raises(mappers.NotFoundError):
+        with assert_raises(errors.NotFoundError):
             self.pypi.get_by_name(u'I-really-hope-this-package-does-not-exist')
 
     def test_download_files_in_url_list(self):

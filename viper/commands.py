@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from viper.entities import Package, Release, File
-from viper import mappers
+from viper import errors
 
 
 class Command(object):
@@ -24,7 +24,7 @@ class SubmitCommand(Command):
     def _get_or_create_new(self, name):
         try:
             return self.packages.get_by_name(name)
-        except mappers.NotFoundError:
+        except errors.NotFoundError:
             return Package(name)
 
     def _release(self, **kwargs):

@@ -8,7 +8,7 @@ from hamcrest import *
 from pyDoubles.framework import *
 
 import viper
-from viper import handlers, mappers, entities, cache
+from viper import handlers, mappers, entities, cache, errors
 
 NAME = u'viper'
 VERSION = u'0.1'
@@ -31,7 +31,7 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
         return package
 
     def test_non_existent_package_returns_not_found(self):
-        when(self.packages.get_by_name).then_raise(mappers.NotFoundError())
+        when(self.packages.get_by_name).then_raise(errors.NotFoundError())
 
         response = self.fetch(self._url_for(NAME))
 
@@ -45,7 +45,7 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
         assert_that_method(self.cache.cache_package).was_called()
 
     def test_cache_a_non_existing_package_from_pypi_returns_not_found(self):
-        when(self.cache.cache_package).then_raise(mappers.NotFoundError())
+        when(self.cache.cache_package).then_raise(errors.NotFoundError())
 
         response = self.fetch(self._url_for(NAME), method='POST', body='')
 
@@ -97,7 +97,7 @@ class TestPackageHandlerWithSpecifiedVersion(testing.AsyncHTTPTestCase):
         return package
 
     def test_non_existent_package_returns_not_found(self):
-        when(self.packages.get_by_name).then_raise(mappers.NotFoundError())
+        when(self.packages.get_by_name).then_raise(errors.NotFoundError())
 
         response = self.fetch(self._url_for(NAME, VERSION))
 

@@ -6,7 +6,7 @@ import functools
 
 from tornado import web, httputil, ioloop
 
-from viper import commands, mappers
+from viper import commands, errors
 
 
 class MainHandler(web.RequestHandler):
@@ -101,7 +101,7 @@ class DistutilsDownloadHandler(web.RequestHandler):
             try:
                 package = self.packages.get_by_name(id_)
                 self.render('distutils_package.html', package=package)
-            except mappers.NotFoundError:
+            except errors.NotFoundError:
                 self._queue_package_for_caching(id_)
                 self.redirect(self.settings.get('pypi_fallback') % id_)
         else:
@@ -139,7 +139,7 @@ class PackageHandler(web.RequestHandler):
             else:
                 current_release = package.release(version)
             self.render('package.html', package=package, current_release=current_release)
-        except (mappers.NotFoundError, ValueError):
+        except (errors.NotFoundError, ValueError):
             raise web.HTTPError(httplib.NOT_FOUND)
 
     def post(self, id_, version=None):
@@ -150,7 +150,7 @@ class PackageHandler(web.RequestHandler):
             self.cache.cache_package(id_)
             self.set_status(httplib.CREATED)
             self.set_header('Location', self.reverse_url('package', id_))
-        except mappers.NotFoundError:
+        except errors.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
 
 
@@ -168,5 +168,5 @@ class FileHandler(web.RequestHandler):
                 self.set_header("Content-Type", 'application/octet-stream')
 
             self.write(self.files.get_by_name(id_))
-        except mappers.NotFoundError:
+        except errors.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)

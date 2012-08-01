@@ -4,17 +4,17 @@ from pyDoubles.framework import *
 from hamcrest import *
 
 from viper.commands import SubmitCommand
-from viper.mappers import PackageMapper, NotFoundError
+from viper import mappers, errors
 
 
 class TestSubmitCommand(object):
 
     def setup(self):
-        self.packages = spy(PackageMapper(empty_stub()))
+        self.packages = spy(mappers.PackageMapper(empty_stub()))
         self.command = SubmitCommand(self.packages)
 
     def test_create_new_package(self):
-        when(self.packages.get_by_name).then_raise(NotFoundError())
+        when(self.packages.get_by_name).then_raise(errors.NotFoundError())
 
         self.command.execute(
             license=u'MIT/X11',

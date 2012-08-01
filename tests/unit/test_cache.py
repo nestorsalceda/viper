@@ -3,7 +3,7 @@
 from pyDoubles.framework import *
 from nose.tools import assert_raises
 
-from viper import mappers, cache
+from viper import mappers, cache, errors
 
 PACKAGE = u'tornado'
 
@@ -18,9 +18,9 @@ class TestCache(object):
         assert_that_method(self.pypi.download_files).was_called()
 
     def test_cache_package_raises_error_if_not_found_in_pypi(self):
-        when(self.pypi.get_by_name).then_raise(mappers.NotFoundError())
+        when(self.pypi.get_by_name).then_raise(errors.NotFoundError())
 
-        with assert_raises(mappers.NotFoundError):
+        with assert_raises(errors.NotFoundError):
             self.cache.cache_package(PACKAGE)
 
     def setup(self):

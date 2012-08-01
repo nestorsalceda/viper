@@ -5,20 +5,12 @@ import datetime
 import urlparse
 import functools
 
-from pymongo import son_manipulator, errors, ASCENDING
+from pymongo import son_manipulator, errors as err, ASCENDING
 import gridfs
 
 from tornado import httpclient, escape
 
-from viper import entities
-
-
-class NotFoundError(Exception):
-    pass
-
-
-class AlreadyExistsError(Exception):
-    pass
+from viper import entities, errors
 
 
 class PackageMapper(object):
@@ -38,7 +30,7 @@ class PackageMapper(object):
     def get_by_name(self, name):
         result = self._packages().find_one({u'name': name})
         if not result:
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return result
 
@@ -50,8 +42,8 @@ class PackageMapper(object):
 
         try:
             package.id_ = self._packages().save(query, safe=True)
-        except errors.DuplicateKeyError:
-            raise AlreadyExistsError()
+        except err.DuplicateKeyError:
+            raise errors.AlreadyExistsError()
 
     def all(self):
         return self._packages().find(sort=[('name', ASCENDING)])
@@ -77,13 +69,13 @@ class FileMapper(object):
 
     def store(self, filename, content):
         if self._files().exists(filename):
-            raise AlreadyExistsError()
+            raise errors.AlreadyExistsError()
 
         self._files().put(content, _id=filename, filename=filename)
 
     def get_by_name(self, filename):
         if not self._files().exists(filename):
-            raise NotFoundError()
+            raise errors.NotFoundError()
 
         return self._files().get(filename).read()
 
@@ -113,7 +105,7 @@ class PythonPackageIndex(object):
             return escape.json_decode(response.body)
         except httpclient.HTTPError as error:
             if error.code == httplib.NOT_FOUND:
-                raise NotFoundError()
+                raise errors.NotFoundError()
 
     def _url(self, name, version=None):
         if version is None:

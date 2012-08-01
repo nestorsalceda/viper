@@ -9,7 +9,7 @@ from pyDoubles.framework import *
 from hamcrest import *
 
 import viper
-from viper import handlers, mappers, entities, cache
+from viper import handlers, mappers, entities, cache, errors
 
 NAME = u'viper'
 VERSION = u'0.1dev'
@@ -62,7 +62,7 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
         return package
 
     def test_redirect_to_fallback_if_not_exists(self):
-        when(self.packages.get_by_name).then_raise(mappers.NotFoundError)
+        when(self.packages.get_by_name).then_raise(errors.NotFoundError)
 
         response = self.fetch(PACKAGE_URL, follow_redirects=False)
 

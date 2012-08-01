@@ -8,7 +8,7 @@ from hamcrest import *
 from pyDoubles.framework import *
 
 import viper
-from viper import handlers, mappers, entities
+from viper import handlers, mappers, errors
 
 FILE = u'viper-0.1.tar.gz'
 EGG_FILE = u'viper-0.1.egg'
@@ -33,7 +33,7 @@ class TestFileHandler(testing.AsyncHTTPTestCase):
         assert_that(response.headers, has_entry('Content-Type', 'application/octet-stream'))
 
     def test_non_existent_file_returns_not_found(self):
-        when(self.files.get_by_name).then_raise(mappers.NotFoundError())
+        when(self.files.get_by_name).then_raise(errors.NotFoundError())
 
         response = self.fetch(self._url_for(FILE))
 
