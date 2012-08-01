@@ -143,13 +143,15 @@ class PackageHandler(web.RequestHandler):
             raise web.HTTPError(httplib.NOT_FOUND)
 
     def post(self, id_, version=None):
-        if self.packages.exists(id_):
-            raise web.HTTPError(httplib.CONFLICT)
-
         try:
-            self.cache.cache_package(id_)
+            self.cache.cache_package(id_, version)
             self.set_status(httplib.CREATED)
-            self.set_header('Location', self.reverse_url('package', id_))
+            if version is None:
+                self.set_header('Location', self.reverse_url('package', id_))
+            else:
+                self.set_header('Location', self.reverse_url('package_with_version', id_, version))
+        except errors.AlreadyExistsError:
+            raise web.HTTPError(httplib.CONFLICT)
         except errors.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
 

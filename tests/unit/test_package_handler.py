@@ -52,7 +52,7 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
         assert_that(response.code, is_(httplib.NOT_FOUND))
 
     def test_cache_a_package_from_pypi_returns_conflict_if_already_exists(self):
-        when(self.packages.exists).then_return(True)
+        when(self.cache.cache_package).then_raise(errors.AlreadyExistsError)
 
         response = self.fetch(self._url_for(NAME), method='POST', body='')
 
@@ -109,6 +109,27 @@ class TestPackageHandlerWithSpecifiedVersion(testing.AsyncHTTPTestCase):
         response = self.fetch(self._url_for(NAME, INEXISTENT_VERSION))
 
         assert_that(response.code, is_(httplib.NOT_FOUND))
+
+    def test_cache_a_package_from_pypi(self):
+        response = self.fetch(self._url_for(NAME, VERSION), method='POST', body='')
+
+        assert_that(response.code, is_(httplib.CREATED))
+        assert_that(response.headers, has_entry('Location', '/packages/%s/%s' % (NAME, VERSION)))
+        assert_that_method(self.cache.cache_package).was_called()
+
+    def test_cache_a_non_existing_package_from_pypi_returns_not_found(self):
+        when(self.cache.cache_package).then_raise(errors.NotFoundError())
+
+        response = self.fetch(self._url_for(NAME, INEXISTENT_VERSION), method='POST', body='')
+
+        assert_that(response.code, is_(httplib.NOT_FOUND))
+
+    def test_cache_a_package_from_pypi_returns_conflict_if_already_exists(self):
+        when(self.cache.cache_package).then_raise(errors.AlreadyExistsError)
+
+        response = self.fetch(self._url_for(NAME, VERSION), method='POST', body='')
+
+        assert_that(response.code, is_(httplib.CONFLICT))
 
     def _url_for(self, id_, version):
         return '/packages/%s/%s' % (id_, version)
