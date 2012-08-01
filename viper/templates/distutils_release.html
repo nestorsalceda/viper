@@ -1,0 +1,13 @@
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Links for {{package.name}}</title>
+	</head>
+	<body>
+		<h1>Links for {{package.name}}</h1>
+
+		{% for file_ in release.files.values() %}
+		<a href="{{handler.reverse_url('file', file_.name)}}">{{file_.name}}</a>
+		{% end %}
+	</body>
+</html>

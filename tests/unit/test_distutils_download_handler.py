@@ -16,6 +16,7 @@ VERSION = u'0.1dev'
 FILENAME = u'viper-0.1dev.tar.gz'
 ROOT_URL = r'/distutils/'
 PACKAGE_URL = u'/distutils/%s/' % NAME
+PACKAGE_URL_WITH_VERSION = u'/distutils/%s/%s' % (NAME, VERSION)
 
 
 class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
@@ -25,19 +26,19 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
 
         response = self.fetch(ROOT_URL)
 
+        self._assert_that_response_is_valid_for_distutils(response)
+        assert_that(response.body, contains_string('<a href="/distutils/viper/" title="viper">viper</a>'))
+
+    def _assert_that_response_is_valid_for_distutils(self, response):
         assert_that(response.code, is_(httplib.OK))
         assert_that(response.headers, has_entry('Content-Type', contains_string('text/html')))
-
-        assert_that(response.body, contains_string('<a href="/distutils/viper/" title="viper">viper</a>'))
 
     def test_generate_simple_html_interface_for_all_packages_without_any_package(self):
         when(self.packages.all).then_return(iter([]))
 
         response = self.fetch(ROOT_URL)
 
-        assert_that(response.code, is_(httplib.OK))
-        assert_that(response.headers, has_entry('Content-Type', contains_string('text/html')))
-
+        self._assert_that_response_is_valid_for_distutils(response)
         assert_that(response.body, contains_string('<body>\n\n</body>'))
 
     def test_generate_simple_html_interface_for_a_package(self):
@@ -45,9 +46,11 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
 
         response = self.fetch(PACKAGE_URL)
 
-        assert_that(response.code, is_(httplib.OK))
-        assert_that(response.headers, has_entry('Content-Type', contains_string('text/html')))
+        self._assert_that_response_is_valid_for_distutils(response)
+        self._assert_that_page_has_links_to_files_for_viper(response)
 
+
+    def _assert_that_page_has_links_to_files_for_viper(self, response):
         assert_that(response.body, all_of(
             contains_string('<h1>Links for viper</h1>'),
             contains_string('<a href="/files/%s">%s</a>' % (FILENAME, FILENAME))
@@ -69,6 +72,14 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
         assert_that(response.code, is_(httplib.FOUND))
         assert_that(response.headers, has_entry('Location', self.pypi_fallback % NAME))
 
+    def test_generate_simple_html_interface_for_a_package_with_specific_version(self):
+        when(self.packages.get_by_name).then_return(self._package())
+
+        response = self.fetch(PACKAGE_URL_WITH_VERSION)
+
+        self._assert_that_response_is_valid_for_distutils(response)
+        self._assert_that_page_has_links_to_files_for_viper(response)
+
     def get_app(self):
         self.packages = spy(mappers.PackageMapper(empty_stub()))
         self.cache = spy(cache.Cache(self.packages, None, None))
@@ -81,6 +92,10 @@ class TestDistutilsDownloadHandler(testing.AsyncHTTPTestCase):
                 web.url(r'/distutils/(?P<id_>%s)/' % viper.identifier(),
                     handlers.DistutilsDownloadHandler, dict(packages=self.packages, cache=self.cache),
                     name='distutils_package'
+                ),
+                web.url(r'/distutils/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
+                    handlers.DistutilsDownloadHandler, dict(packages=self.packages, cache=self.cache),
+                    name='distutils_package_with_version'
                 ),
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
                     handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),

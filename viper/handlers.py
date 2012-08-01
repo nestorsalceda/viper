@@ -96,19 +96,22 @@ class DistutilsDownloadHandler(web.RequestHandler):
         self.packages = packages
         self.cache = cache
 
-    def get(self, id_=None):
-        if id_:
+    def get(self, id_=None, version=None):
+        if id_ is None:
+            self.render('distutils.html', packages=self.packages.all())
+        else:
             try:
                 package = self.packages.get_by_name(id_)
-                self.render('distutils_package.html', package=package)
+                if version is None:
+                    self.render('distutils_package.html', package=package)
+                else:
+                    self.render('distutils_release.html', package=package, release=package.release(version))
             except errors.NotFoundError:
-                self._queue_package_for_caching(id_)
+                self._queue_package_for_caching(id_, version)
                 self.redirect(self.settings.get('pypi_fallback') % id_)
-        else:
-            self.render('distutils.html', packages=self.packages.all())
 
-    def _queue_package_for_caching(self, id_):
-        ioloop.IOLoop.instance().add_callback(functools.partial(self.cache.cache_package, id_))
+    def _queue_package_for_caching(self, id_, version):
+        ioloop.IOLoop.instance().add_callback(functools.partial(self.cache.cache_package, id_, version))
 
 
 class AllPackagesHandler(web.RequestHandler):

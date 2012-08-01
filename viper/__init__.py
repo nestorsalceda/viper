@@ -32,6 +32,10 @@ def application(**settings):
                 handlers.DistutilsDownloadHandler, dict(packages=packages, cache=cache),
                 name='distutils_package'
             ),
+            web.url(r'/distutils/(?P<id_>%s)/(?P<version>%s)' % (identifier(), identifier()),
+                handlers.DistutilsDownloadHandler, dict(packages=packages, cache=cache),
+                name='distutils_package_with_version'
+            ),
             web.url(r'/distutils',
                 handlers.DistutilsHandler, dict(submit=submit, upload=upload)
             ),
