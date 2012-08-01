@@ -5,6 +5,7 @@ import datetime
 from hamcrest import *
 from nose.tools import raises
 
+from viper import errors
 from viper.entities import Package, Release
 
 NAME = u'viper'
@@ -23,7 +24,7 @@ class TestPackage(object):
         assert_that(self.package.last_updated_on, is_(datetime.datetime))
         assert_that(self.package.is_from_pypi, is_(False))
 
-    @raises(ValueError)
+    @raises(errors.NotFoundError)
     def test_getting_inexistent_release_raises_error(self):
         self.package.release(VERSION)
 

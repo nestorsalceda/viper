@@ -5,6 +5,8 @@ import datetime
 from docutils import core
 from docutils.writers import html4css1
 
+from viper import errors
+
 
 class File(object):
     def __init__(self, name, filetype, md5_digest):
@@ -30,7 +32,8 @@ class Release(object):
 
     def add_file(self, file_):
         if file_.name in self.files:
-            raise ValueError
+            raise errors.AlreadyExistsError("File with name %s already exists in this release" % file_.name)
+
 
         self.files[file_.name] = file_
 
@@ -58,7 +61,7 @@ class Package(object):
 
     def release(self, version):
         if not version in self._releases:
-            raise ValueError()
+            raise errors.NotFoundError("Release with version %s doesn't exist for this package" % version)
 
         return self._releases[version]
 

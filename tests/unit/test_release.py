@@ -6,6 +6,7 @@ from hamcrest import *
 from nose.tools import assert_raises
 
 from viper.entities import Release, File
+from viper import errors
 
 VERSION = u'0.1dev'
 FILE_NAME = u'viper-0.1dev.tar.gz'
@@ -41,7 +42,7 @@ class TestRelease(object):
         )
         self.release.add_file(uploaded)
 
-        with assert_raises(ValueError):
+        with assert_raises(errors.AlreadyExistsError):
             self.release.add_file(uploaded)
 
     def test_html_description_is_html(self):
