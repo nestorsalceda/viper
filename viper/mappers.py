@@ -90,13 +90,11 @@ class FileMapper(object):
 
 class PythonPackageIndex(object):
 
-    URL = u'http://pypi.python.org/pypi/%s/json'
-
     def __init__(self):
         self._httpclient = httpclient.HTTPClient()
 
-    def get_by_name(self, name):
-        response = self._query_pypi(name)
+    def get_by_name(self, name, version=None):
+        response = self._query_pypi(name, version)
 
         package = entities.Package(name)
         package.is_from_pypi = True
@@ -109,13 +107,18 @@ class PythonPackageIndex(object):
         package.store_release(release)
         return package
 
-    def _query_pypi(self, name):
+    def _query_pypi(self, name, version=None):
         try:
-            response = self._httpclient.fetch(self.URL % name)
+            response = self._httpclient.fetch(self._url(name, version))
             return escape.json_decode(response.body)
         except httpclient.HTTPError as error:
             if error.code == httplib.NOT_FOUND:
                 raise NotFoundError()
+
+    def _url(self, name, version=None):
+        if version is None:
+            return u'http://pypi.python.org/pypi/%s/json' % name
+        return u'http://pypi.python.org/pypi/%s/%s/json' % (name, version)
 
     def download_files(self, name, on_file_downloaded):
 

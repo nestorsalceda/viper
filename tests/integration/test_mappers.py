@@ -189,7 +189,7 @@ class TestPythonPackageIndex(testing.AsyncTestCase):
             self.pypi.get_by_name(u'I-really-hope-this-package-does-not-exist')
 
     def test_download_files_in_url_list(self):
-        self.pypi.download_files(u'Flask', self._assert_that_flask_was_downloaded)
+        self.pypi.download_files(u'Flask', on_file_downloaded=self._assert_that_flask_was_downloaded)
         self.wait()
 
     def _assert_that_flask_was_downloaded(self, file_, content):
@@ -201,6 +201,13 @@ class TestPythonPackageIndex(testing.AsyncTestCase):
 
         assert_that(content, is_not(none()))
         self.stop()
+
+    def test_exists_a_package_with_specific_version(self):
+        package = self.pypi.get_by_name(u'tornado', u'2.1')
+
+        assert_that(package.is_from_pypi)
+        assert_that(package.name, is_(u'tornado'))
+        assert_that(package.release(u'2.1'), is_(not_none()))
 
     def test_download_files_in_download_url_if_url_list_is_empty(self):
         self.pypi.download_files(u'tornado', self._assert_that_tornado_was_downloaded)
