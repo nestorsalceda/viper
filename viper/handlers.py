@@ -167,10 +167,10 @@ class FileHandler(web.RequestHandler):
     def get(self, id_):
         try:
             mime_type, encoding = mimetypes.guess_type(id_)
-            if mime_type:
-                self.set_header("Content-Type", mime_type)
-            else:
+            if mime_type is None:
                 self.set_header("Content-Type", 'application/octet-stream')
+            else:
+                self.set_header("Content-Type", mime_type)
 
             self.write(self.files.get_by_name(id_))
         except errors.NotFoundError:
