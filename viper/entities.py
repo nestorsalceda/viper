@@ -71,6 +71,12 @@ class Package(object):
     def last_release(self):
         return self.release(self._releases.keys()[0])
 
+    def has_release(self, release):
+        if isinstance(release, basestring):
+            return release in self._releases
+
+        return release.version in self._releases
+
     def __eq__(self, other):
         return self.id_ == other.id_
 

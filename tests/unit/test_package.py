@@ -39,3 +39,13 @@ class TestPackage(object):
         self.package.store_release(Release(VERSION))
 
         assert_that(self.package.releases(), has_length(1))
+
+    def test_package_has_a_release_if_was_already_stored(self):
+        self.package.store_release(Release(VERSION))
+
+        assert_that(self.package.has_release(Release(VERSION)), is_(True))
+        assert_that(self.package.has_release(VERSION), is_(True))
+
+    def test_package_hasnt_a_release_if_wasnt_stored(self):
+        assert_that(self.package.has_release(Release(VERSION)), is_(False))
+        assert_that(self.package.has_release(VERSION), is_(False))
