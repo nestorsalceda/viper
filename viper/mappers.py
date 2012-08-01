@@ -120,7 +120,7 @@ class PythonPackageIndex(object):
             return u'http://pypi.python.org/pypi/%s/json' % name
         return u'http://pypi.python.org/pypi/%s/%s/json' % (name, version)
 
-    def download_files(self, name, on_file_downloaded):
+    def download_files(self, name, version=None, on_file_downloaded=None):
 
         def _on_file_downloaded_from_url(url, response):
             on_file_downloaded(
@@ -135,7 +135,7 @@ class PythonPackageIndex(object):
                 response.body
             )
 
-        response = self._query_pypi(name)
+        response = self._query_pypi(name, version)
         client = httpclient.AsyncHTTPClient()
 
         if not response[u'urls']:

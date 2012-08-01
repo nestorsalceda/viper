@@ -16,7 +16,7 @@ class Cache(object):
         self.packages.store(package)
 
         on_file_downloaded = functools.partial(self._on_file_downloaded, package)
-        self.pypi.download_files(id_, on_file_downloaded)
+        self.pypi.download_files(id_, on_file_downloaded=on_file_downloaded)
 
     def _on_file_downloaded(self, package, file_, content):
         logging.info('Downloaded %s', file_.name)

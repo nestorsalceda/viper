@@ -210,15 +210,13 @@ class TestPythonPackageIndex(testing.AsyncTestCase):
         assert_that(package.release(u'2.1'), is_(not_none()))
 
     def test_download_files_in_download_url_if_url_list_is_empty(self):
-        self.pypi.download_files(u'tornado', self._assert_that_tornado_was_downloaded)
+        self.pypi.download_files(u'tornado', version=u'2.1', on_file_downloaded=self._assert_that_tornado_was_downloaded)
         self.wait()
 
     def _assert_that_tornado_was_downloaded(self, file_, content):
-        from nose.plugins.skip import SkipTest
-        raise SkipTest("Tornado 2.3 is now hosted on Pypi.  I have to look other package hosted externally")
-
         assert_that(file_, all_of(
             has_property(u'name', starts_with(u'tornado')),
+            has_property(u'name', contains_string(u'2.1')),
             has_property(u'filetype', u'sdist'),
             has_property(u'md5_digest', none())
         ))
