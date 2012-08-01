@@ -139,7 +139,7 @@ class PackageHandler(web.RequestHandler):
             else:
                 current_release = package.release(version)
             self.render('package.html', package=package, current_release=current_release)
-        except (errors.NotFoundError, ValueError):
+        except errors.NotFoundError:
             raise web.HTTPError(httplib.NOT_FOUND)
 
     def post(self, id_, version=None):
