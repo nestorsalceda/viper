@@ -44,6 +44,10 @@ class Release(object):
         return core.publish_parts(self.description, writer=html4css1.Writer())['html_body']
 
 
+    def __gt__(self, release):
+        return self.version > release.version
+
+
 class Package(object):
 
     def __init__(self, name):
@@ -66,10 +70,10 @@ class Package(object):
         return self._releases[version]
 
     def releases(self):
-        return self._releases.values()
+        return sorted(self._releases.values(), reverse=True)
 
     def last_release(self):
-        return self.release(self._releases.keys()[0])
+        return self.releases()[0]
 
     def has_release(self, release):
         if isinstance(release, basestring):

@@ -8,6 +8,7 @@ from nose.tools import assert_raises
 from viper.entities import Release, File
 from viper import errors
 
+NEWER_VERSION = u'2.0'
 VERSION = u'0.1dev'
 FILE_NAME = u'viper-0.1dev.tar.gz'
 FILE_TYPE = u'sdist'
@@ -58,3 +59,8 @@ class TestRelease(object):
 ============'''
 
         assert_that(self.release.html_description(), contains_string('System Message: WARNING'))
+
+    def test_version_is_greater_than_other(self):
+        newer = Release(NEWER_VERSION)
+
+        assert_that(newer, is_(greater_than(self.release)))
