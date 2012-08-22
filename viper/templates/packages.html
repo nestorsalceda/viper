@@ -18,7 +18,9 @@ All packages · Viper
 			{% for package in packages %}
 				<li class="package">
 					<a href="{{handler.reverse_url('package', package.name)}}">{{package.name}}</a>
+					{% if package.last_release().summary %}
 					<p>{{package.last_release().summary}}</p>
+					{% end %}
 				</li>
 			{% end %}
 		</ul>
