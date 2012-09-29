@@ -73,6 +73,10 @@ class TestPackageHandlerToLastVersion(testing.AsyncHTTPTestCase):
                 web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
                     handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package_with_version'
+                ),
+                web.url(r'/packages',
+                    handlers.AllPackagesHandler, dict(packages=None),
+                    name='packages'
                 )
             ],
             debug=True,
@@ -146,6 +150,10 @@ class TestPackageHandlerWithSpecifiedVersion(testing.AsyncHTTPTestCase):
                 web.url(r'/packages/(?P<id_>%s)/(?P<version>%s)' % (viper.identifier(), viper.identifier()),
                     handlers.PackageHandler, dict(packages=self.packages, cache=self.cache),
                     name='package_with_version'
+                ),
+                web.url(r'/packages',
+                    handlers.AllPackagesHandler, dict(packages=None),
+                    name='packages'
                 )
             ],
             debug=True,
