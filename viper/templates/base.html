@@ -20,7 +20,7 @@
 					<a class="brand" href="/">Viper</a>
 
 					<ul class="nav">
-						<li {% if request.path.endswith(reverse_url('packages')) %}class="active"{% end %}>
+						<li{% if request.path.endswith(reverse_url('packages')) %} class="active"{% end %}>
 							<a href="{{reverse_url('packages')}}" title="Packages">Packages</a>
 						</li>
 					</ul>
