@@ -37,7 +37,8 @@ class TestAllPackagesHandler(testing.AsyncHTTPTestCase):
 
         return web.Application([
                 web.url(r'/packages',
-                    handlers.AllPackagesHandler, dict(packages=self.packages)
+                    handlers.AllPackagesHandler, dict(packages=self.packages),
+                    name='packages'
                 ),
                 web.url(r'/packages/(?P<id_>%s)' % viper.identifier(),
                     handlers.PackageHandler, dict(packages=self.packages, pypi=None, files=None),
