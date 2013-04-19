@@ -19,7 +19,7 @@ setup(name='viper',
           'tornado',
           'pymongo',
           'docutils',
-          'pydoubles',
+          'pyDoubles==1.4',
           'nose',
           'pyhamcrest'
       ],
