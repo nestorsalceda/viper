@@ -6,7 +6,7 @@ import logging
 from tornado import ioloop, options
 from viper import application
 
-options.define('address', default='127.0.0.1', help='listen in given address', type=str)
+options.define('address', default='0.0.0.0', help='listen in given address', type=str)
 options.define('port', default=os.environ.get('PORT', 3000), help='run on the given port', type=int)
 options.define('mongodb_host', default=os.environ.get('MONGOHQ_URL', "mongodb://127.0.0.1:27017"), type=str)
 options.define('mongodb_database', default=os.environ.get('MONGOHQ_URL', "viper_package_index"), type=str)
