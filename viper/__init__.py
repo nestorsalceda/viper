@@ -8,10 +8,9 @@ from viper import handlers, commands, mappers, cache as c
 
 
 def application(**settings):
-    database = pymongo.Connection(
-        settings['mongodb']['host'],
-        settings['mongodb']['port']
-    )['viper_package_index']
+    database = pymongo.MongoClient(
+        host=settings['mongodb']['host']
+    )[settings['mongodb']['database']]
 
     packages = mappers.PackageMapper(database)
     files = mappers.FileMapper(database)
