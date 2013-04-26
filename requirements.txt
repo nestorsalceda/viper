@@ -1,4 +1,4 @@
 tornado==3.0.1
 pymongo==2.5
 docutils==0.10
-mamba
+https://github.com/nestorsalceda/mamba/archive/master.zip
