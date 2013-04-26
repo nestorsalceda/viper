@@ -1,4 +1,5 @@
 services: mongodb
 language: python
-install: python setup.py develop
-script: nosetests
+install: "pip install -r requirements.txt"
+before_script: python setup.py develop
+script: "nosetests && mamba spec/*.py"

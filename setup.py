@@ -21,7 +21,9 @@ setup(name='viper',
           'docutils',
           'pyDoubles==1.4',
           'nose',
-          'pyhamcrest'
+          'pyhamcrest',
+          'mamba',
+          'sure'
       ],
       entry_points="""
       # -*- Entry points: -*-
