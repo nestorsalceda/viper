@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
 
-from pyDoubles.framework import *
-from hamcrest import *
+from mamba import describe
+from sure import expect
+from doublex import *
 
 from viper.commands import SubmitCommand
 from viper import mappers, errors
 
 
-class TestSubmitCommand(object):
+with describe('SubmitCommand'):
 
-    def setup(self):
-        self.packages = spy(mappers.PackageMapper(empty_stub()))
-        self.command = SubmitCommand(self.packages)
+    def it_should_create_new_package_if_not_exists():
+        repository = Spy(mappers.PackageMapper(None))
+        command = SubmitCommand(repository)
 
-    def test_create_new_package(self):
-        when(self.packages.get_by_name).then_raise(errors.NotFoundError())
+        with repository:
+            repository.get_by_name(ANY_ARG).raises(errors.NotFoundError())
 
-        self.command.execute(
+        command.execute(
             license=u'MIT/X11',
             name=u'viper',
             author=u'Néstor Salceda',
@@ -31,4 +32,4 @@ class TestSubmitCommand(object):
             description=None
         )
 
-        assert_that_method(self.packages.store).was_called()
+        expect(called().matches(repository.store)).to.be.true
