@@ -30,35 +30,49 @@
 
       </header>
       <section>
-        <p>.. image:: <a href="https://secure.travis-ci.org/nestorsalceda/viper.png">https://secure.travis-ci.org/nestorsalceda/viper.png</a></p>
+        <h1>Viper Package Index</h1>
 
-<h1>Viper Package Index</h1>
+<p><a href="https://travis-ci.org/nestorsalceda/viper"><img src="https://travis-ci.org/nestorsalceda/viper.png" alt="Build Status"></a></p>
 
-<p>Viper is a <code>Python Package Index &lt;http://pypi.python.org&gt;</code>_ implementation.</p>
+<p>Viper is a <a href="http://pypi.python.org">Python Package Index</a> implementation.
+Designed for being ran in your own network, behind your firewall.</p>
 
-<h2>What makes Viper different?</h2>
+<h2>Features</h2>
 
-<p>Viper is designed for running behind a firewall, in your own network.  This
-allows you to share non-public packages with other members in your team.</p>
+<ul>
+<li>Upload non-public Python eggs</li>
+<li>Smart and transparent cache. Ask for packages to Viper, and it will cache them without
+blocking new requests.</li>
+<li>Blazing fast. Get faster results from your Continuous Integration. Deploy your
+product faster.</li>
+<li>Scale up replicating with MongoDB.</li>
+<li>Fault tolerance. Sincerely, I'm so tired of downtimes. Avoid work paralysis when
+third party infrastructure is down.</li>
+</ul><h2>How can I use it?</h2>
 
-<p>Viper is designed to be blazing fast.  Running behind your firewall, you can
-install it near to your Continuous Integration (or Continuous Delivery) server
-and feel how you get feedback faster.  And as it has replication support using
-MongoDB, you can have your own mirrors in minutes.</p>
+<p>Deploy it. It's a simple <a href="http://www.tornadoweb.org">Tornado</a> application.</p>
 
-<p>I'm still cooking a cache for keeping packages you use more, but I'm pretty
-sure I will finish it soon.  This means fault tolerance (sometimes PyPI or
-other services are down) and of course faster downloads.</p>
+<p>And then, use http://yourhost/distutils</p>
 
-<p>And finally simplicity.  Viper should be easy to deploy, and easy to configure
-(also in the client), you should start using it:</p>
+<ul>
+<li><code>easy_install --index-url http://yourhost/distutils package</code></li>
+<li><code>pip install --index-url http://yourhost/distutils package</code></li>
+<li><code>python setup.py register ...</code></li>
+</ul><h2>How it works?</h2>
 
-<p>::</p>
+<p>When a package request comes to viper, it tries to serve by itself, but if it's
+not cached, you will be redirected to official pypi (or mirrors if you
+configured that setting).</p>
 
-<p>$ easy_install --index-url http://yourhost/distutils package</p>
+<p>Then next time, viper will server by itself the package requested.</p>
 
-<p>If the package doesn't exist in the index, it redirects automatically to PyPI
-(or other mirrors).</p>
+<h2>Demo</h2>
+
+<p>Try the <a href="http://viper-pypi.herokuapp.com">demo</a> running in heroku infrastructure.</p>
+
+<h2>Contribute</h2>
+
+<p>If you'd like to contribute, fork <a href="http://github.com/nestorsalceda/viper">repository</a>, and send a pull request.</p>
       </section>
       <footer>
         <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
