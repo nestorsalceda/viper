@@ -23,7 +23,8 @@ setup(name='viper',
           'nose',
           'pyhamcrest',
           'mamba',
-          'sure'
+          'sure',
+          'doublex'
       ],
       entry_points="""
       # -*- Entry points: -*-
