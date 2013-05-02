@@ -5,7 +5,7 @@ version = '0.1'
 setup(name='viper',
       version=version,
       description="",
-      long_description=open('README.rst').read(),
+      long_description=open('README.md').read(),
       classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
       keywords='',
       author='N\xc3\xa9stor Salceda',
