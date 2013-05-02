@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from pyDoubles.framework import *
-from hamcrest import *
+from mamba import describe
+from sure import expect
+from doublex import *
 
 from viper.commands import FileUploadCommand
 from viper.mappers import PackageMapper, FileMapper
@@ -13,19 +14,18 @@ FILE_CONTENT = u'content'
 FILE_NAME = u'viper-0.1dev.tar.gz'
 
 
-class TestFileUploadCommand(object):
+with describe('FileUploadCommand'):
+    def it_should_upload_file_for_an_existent_package():
+        package_repository = Spy(PackageMapper(None))
+        file_repository = Spy(FileMapper(None))
+        command = FileUploadCommand(package_repository, file_repository)
 
-    def setup(self):
-        self.packages = spy(PackageMapper(empty_stub()))
-        self.files = spy(FileMapper(empty_stub()))
-        self.command = FileUploadCommand(self.packages, self.files)
-
-    def test_upload_file_for_existent_package(self):
         package = Package(NAME)
         package.store_release(Release(VERSION))
-        when(self.packages.get_by_name).then_return(package)
+        with package_repository:
+            package_repository.get_by_name(ANY_ARG).returns(package)
 
-        self.command.execute(
+        command.execute(
             name=NAME,
             version=VERSION,
             filetype=u'sdist',
@@ -37,8 +37,5 @@ class TestFileUploadCommand(object):
             }
         )
 
-        assert_that_method(self.packages.store).was_called()
-        assert_that_method(self.files.store).was_called().with_args(
-            FILE_NAME,
-            FILE_CONTENT
-        )
+        expect(called().matches(package_repository.store)).to.be.true
+        expect(called().with_args(FILE_NAME, FILE_CONTENT).matches(file_repository.store)).to.be.true
